@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Integrado de Supervivencia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: red;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: #6a0000;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 15px 45px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #ff9999;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 300px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            border: none;
+            background-color: #6a0000;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff9999;
+        }
+
+        .btn-back {
+            background-color: #fff;
+            color: #6a0000;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background-color: #ff9999;
+            color: #fff;
+        }
+
+        #register-plate {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Vista principal -->
+    <div id="main-view">
+        <img src="transmi.jpg" alt="Imagen representativa de Transmile">
+        <h1>SISTEMA INTEGRADO DE SUPERVIVENCIA</h1>
+        <div class="btn-container">
+            <button class="btn" onclick="showRegisterPlate()">Registrar Placa</button>
+            <button class="btn" onclick="openSettings()">Configuraciones</button>
+        </div>
+    </div>
+
+    <!-- Vista de registro de placa -->
+    <div id="register-plate">
+        <h1>Registrar Placa</h1>
+        <img src="Transmile.png" alt="Imagen representativa de Transmile">
+        <div class="form-container">
+            <input type="text" id="user" placeholder="Nombre de Usuario">
+            <input type="text" id="plate" placeholder="Placa Asignada" readonly>
+            <button onclick="generatePlate()">REGISTRAR USUARIO</button>
+            <a href="#" class="btn-back" onclick="goBack()">VOLVER</a>
+        </div>
+    </div>
+
+    <script>
+        function showRegisterPlate() {
+            document.getElementById('main-view').style.display = 'none';
+            document.getElementById('register-plate').style.display = 'flex';
+        }
+
+        function goBack() {
+            document.getElementById('register-plate').style.display = 'none';
+            document.getElementById('main-view').style.display = 'flex';
+        }
+
+        function openSettings() {
+            alert("Abriendo configuraciones...");
+        }
+
+        function generatePlate() {
+            const user = document.getElementById('user').value;
+            if (!user) {
+                alert("Por favor, ingresa tu nombre de usuario.");
+                return;
+            }
+
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const numbers = "0123456789";
+            let plate = "";
+
+            for (let i = 0; i < 3; i++) {
+                plate += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+
+            plate += "-";
+
+            for (let i = 0; i < 3; i++) {
+                plate += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            }
+
+            document.getElementById('plate').value = plate;
+        }
+    </script>
+</body>
+</html>
