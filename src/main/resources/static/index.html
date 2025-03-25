@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación Web</title>
+    <link rel="shortcut icon" href="./images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/normalize.css">
+    <link rel="stylesheet" href="./css/estilos.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #9b4dca, #6a006a);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        header {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        header:hover {
+            transform: translateY(-5px);
+        }
+
+        .nav__title {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #ffebff;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .btn-container-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .btn-container-wrapper:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-morado {
+            background: linear-gradient(135deg, #9b10ff, #6a008a);
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px 45px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            width: 220px;
+        }
+
+        .btn-morado:hover {
+            background: linear-gradient(135deg, #6a006a, #320032);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-morado:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-small {
+            background: #ffccff;
+            color: #6a006a;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-small:hover {
+            background: #ff99ff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-small:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffccff;
+            margin-bottom: 10px; /* Agrega margen inferior */
+            display: block;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+            text-align: center;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+        }
+
+        .image-wrapper {
+            margin-top: 20px; /* Espacio entre el texto y la imagen */
+            margin-bottom: 20px; /* Espacio entre la imagen y el formulario */
+        }
+
+        .image-wrapper img {
+            width: 100%; /* Ajusta el tamaño al contenedor */
+            max-width: 300px; /* Tamaño máximo de la imagen */
+            border-radius: 10px; /* Bordes redondeados */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra para la imagen */
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .property-list {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .property-list:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .property-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .property-item:last-child {
+            border-bottom: none;
+        }
+
+        .property-item button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aplicación Web</h1>
+    <div class="btn-container">
+        <button class="btn-morado" onclick="showForm()">Registrar Propiedad</button>
+        <button class="btn-morado" onclick="showSearch()">Buscar Archivos</button>
+        <button class="btn-morado" onclick="showProperties()">Ver Propiedades</button>
+    </div>
+    <div id="form-container" style="display:none;">
+        <h1>Registro de Propiedad</h1>
+        <div class="form-container">
+            <form id="propertyForm" method="post" onsubmit="return submitForm(event)">
+                <div class="form-group">
+                    <label for="address">Dirección:</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="price">Precio:</label>
+                    <input type="number" id="price" name="price" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="size">Tamaño (m²):</label>
+                    <input type="number" id="size" name="size" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="description">Descripción:</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+                <input class="btn-morado" value="Registrar Propiedad" onclick="validateForm()">
+            </form>
+            <button class="btn-small" onclick="showButtons()">Volver</button>
+        </div>
+    </div>
+    <div id="search-container" style="display:none;">
+        <h1>Encuentra tus archivos en segundos</h1>
+        <div class="image-wrapper">
+            <img src="GatoIntelectual.jpg" alt="Imagen representativa de búsqueda">
+        </div>        
+        <form action="/hello">
+            <label for="name">Escribe el nombre del archivo que deseas visualizar: </label><br>
+            <input type="text" id="name" name="name" placeholder="Ejemplo: prueba.txt"><br><br>
+            <input type="button" class="btn-morado" value="Buscar" onclick="loadGetMsg()">
+        </form> 
+        <div id="getrespmsg" class="btn-container-wrapper"></div>
+        <button class="btn-small" onclick="showButtons()">Volver</button>
+    </div>
+    <div id="properties-container" style="display:none;">
+        <h1>Lista de Propiedades</h1>
+        <div class="property-list">
+            <!-- Aquí se insertarán dinámicamente las propiedades -->
+        </div>
+        <button class="btn-small" onclick="showButtons()">Volver</button>
+    </div>
+
+    <script>
+        const baseUrl = window.location.origin;
+
+        function showForm() {
+            document.getElementById('form-container').style.display = 'block';
+            document.getElementById('search-container').style.display = 'none';
+            document.getElementById('properties-container').style.display = 'none';
+            document.querySelector('.btn-container').style.display = 'none';
+        }
+
+        function showSearch() {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('search-container').style.display = 'block';
+            document.getElementById('properties-container').style.display = 'none';
+            document.querySelector('.btn-container').style.display = 'none';
+        }
+
+        function showProperties() {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('search-container').style.display = 'none';
+            document.getElementById('properties-container').style.display = 'block';
+            document.querySelector('.btn-container').style.display = 'none';
+            loadProperties();
+        }
+
+        function showButtons() {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('search-container').style.display = 'none';
+            document.getElementById('properties-container').style.display = 'none';
+            document.querySelector('.btn-container').style.display = 'flex';
+        }
+
+        function loadProperties() {
+            fetch(`${baseUrl}/properties`)
+                .then(response => response.json())
+                .then(properties => {
+                    const propertyList = document.querySelector('.property-list');
+                    propertyList.innerHTML = ''; // Limpiar la lista antes de agregar nuevas propiedades
+
+                    properties.forEach(property => {
+                        const propertyItem = document.createElement('div');
+                        propertyItem.className = 'property-item';
+                        propertyItem.innerHTML = `
+                            <div>
+                                <strong>Dirección:</strong> ${property.address}<br>
+                                <strong>Precio:</strong> ${property.price}<br>
+                                <strong>Tamaño:</strong> ${property.size} m²<br>
+                                <strong>Descripción:</strong> ${property.description}
+                            </div>
+                            <div>
+                                <button class="btn-small" onclick="viewProperty(${property.id})">Ver</button>
+                                <button class="btn-small" onclick="updateProperty(${property.id})">Actualizar</button>
+                                <button class="btn-small" onclick="deleteProperty(${property.id})">Eliminar</button>
+                            </div>
+                        `;
+                        propertyList.appendChild(propertyItem);
+                    });
+                })
+                .catch(error => console.error('Error al cargar las propiedades:', error));
+        }
+
+        function viewProperty(id) {
+            fetch(`${baseUrl}/properties/${id}`)
+                .then(response => response.json())
+                .then(property => {
+                    alert(`Propiedad: ${property.address}\nPrecio: ${property.price}\nTamaño: ${property.size} m²\nDescripción: ${property.description}`);
+                })
+                .catch(error => console.error('Error al ver la propiedad:', error));
+        }
+
+        function updateProperty(id) {
+            const newAddress = prompt('Nueva dirección:');
+            const newPrice = prompt('Nuevo precio:');
+            const newSize = prompt('Nuevo tamaño (m²):');
+            const newDescription = prompt('Nueva descripción:');
+
+            if (newAddress && newPrice && newSize && newDescription) {
+                fetch(`${baseUrl}/properties/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        address: newAddress,
+                        price: newPrice,
+                        size: newSize,
+                        description: newDescription
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Propiedad actualizada correctamente');
+                    loadProperties();
+                })
+                .catch(error => console.error('Error al actualizar la propiedad:', error));
+            } else {
+                alert('Todos los campos son obligatorios para actualizar la propiedad.');
+            }
+        }
+
+        function deleteProperty(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta propiedad?')) {
+                fetch(`${baseUrl}/properties/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Propiedad eliminada correctamente');
+                    loadProperties();
+                })
+                .catch(error => console.error('Error al eliminar la propiedad:', error));
+            }
+        }
+
+        function loadGetMsg() {
+            let nameVar = document.getElementById("name").value;
+            fetch(`${baseUrl}/hello?name=${nameVar}`)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const contentType = response.headers.get("Content-Type");
+                    if (contentType.startsWith("image/")) {
+                        const blob = new Blob([data], { type: contentType });
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(blob);
+                        document.getElementById("getrespmsg").innerHTML = '';
+                        document.getElementById("getrespmsg").appendChild(img);
+                    } else {
+                        const text = new TextDecoder("utf-8").decode(data);
+                        document.getElementById("getrespmsg").innerHTML = text;
+                    }
+                })
+                .catch(error => console.error('Error al buscar el archivo:', error));
+        }
+
+        function validateForm() {
+            event.preventDefault();
+            const address = document.getElementById('address').value;
+            const price = document.getElementById('price').value;
+            const size = document.getElementById('size').value;
+            const description = document.getElementById('description').value;
+
+            if (!address || !price || !size || !description) {
+                alert('Todos los campos son obligatorios.');
+                return false;
+            }
+
+            if (isNaN(price) || price <= 0) {
+                alert('El precio debe ser un número positivo.');
+                return false;
+            }
+
+            if (isNaN(size) || size <= 0) {
+                alert('El tamaño debe ser un número positivo.');
+                return false;
+            }
+
+            const property = {
+                address: address,
+                price: price,
+                size: size,
+                description: description
+            };
+
+            console.log(JSON.stringify(property));
+            fetch(`${baseUrl}/properties`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(property)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Propiedad registrada correctamente');
+                showButtons();
+            })
+            .catch(error => console.error('Error al registrar la propiedad:', error));
+
+            return true;
+        }
+    </script>
+</body>
+</html>
