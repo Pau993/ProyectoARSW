@@ -1,9 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let buses = {}; // Lista de buses en el juego
+let buses = {};
 
-// 🚍 Función para dibujar todos los buses en el canvas
 function drawBuses() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
