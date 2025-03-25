@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITS Game 🚍</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>SITS Game 🚍</h1>
+    <button id="connectBtn">Conectar</button>
+    <ul id="messages"></ul>
+
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@latest/bundles/stomp.umd.min.js"></script>
+    <script src="bus.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
