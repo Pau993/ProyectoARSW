@@ -1,35 +1,44 @@
 let client = null;
 
-// 📌 Esperar a que el DOM cargue antes de asignar eventos
 document.addEventListener("DOMContentLoaded", () => {
     const connectBtn = document.getElementById("connectBtn");
 
     if (connectBtn) {
         connectBtn.addEventListener("click", connectWebSocket);
     }
+
+    // 🔹 Asegurar que los botones existen antes de asignar eventos
+    const registerBtn = document.querySelector(".btn-container button:nth-child(2)");
+    if (registerBtn) {
+        registerBtn.addEventListener("click", showRegisterPlate);
+    }
+
+    const backBtn = document.querySelector(".btn-back");
+    if (backBtn) {
+        backBtn.addEventListener("click", goBack);
+    }
 });
 
 function connectWebSocket() {
-    if (client && client.connected) {
+    if (window.client && window.client.connected) {
         alert("Ya estás conectado al WebSocket.");
         return;
     }
 
     const socket = new SockJS("http://localhost:8080/ws");
-    client = new StompJs.Client({
+    window.client = new StompJs.Client({
         webSocketFactory: () => socket,
         debug: (str) => console.log(str),
         onConnect: () => {
             console.log("✅ Conectado al servidor WebSocket");
             alert("Conectado al WebSocket correctamente.");
-            localStorage.setItem("wsConnected", "true"); // Guardar estado de conexión
         },
         onStompError: (frame) => {
             console.error("❌ Error en WebSocket:", frame);
         }
     });
 
-    client.activate();
+    window.client.activate();
 }
 
 function showRegisterPlate() {
@@ -40,10 +49,6 @@ function showRegisterPlate() {
 function goBack() {
     document.getElementById('register-plate').style.display = 'none';
     document.getElementById('main-view').style.display = 'flex';
-}
-
-function openSettings() {
-    alert("Abriendo configuraciones...");
 }
 
 function generatePlate() {
