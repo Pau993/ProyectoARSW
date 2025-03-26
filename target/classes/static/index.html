@@ -3,19 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITS Game 🚍</title>
+    <title>Sistema Integrado de Supervivencia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>SITS Game 🚍</h1>
-    <button id="connectBtn">Conectar</button>
-    <ul id="messages"></ul>
+    <!-- Vista principal -->
+    <div id="main-view">
+        <img src="transmi.jpg" alt="Imagen representativa de Transmile">
+        <h1>SISTEMA INTEGRADO DE SUPERVIVENCIA</h1>
+        <div class="btn-container">
+            <button id="connectBtn" class="btn">Conectar al WebSocket</button>
+            <button class="btn" onclick="showRegisterPlate()">Registrar Placa</button>
+            <button class="btn" onclick="openSettings()">Configuraciones</button>
+        </div>
+    </div>
 
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <!-- Vista de registro de placa -->
+    <div id="register-plate">
+        <h1>Registrar Placa</h1>
+        <img src="Transmile.png" alt="Imagen representativa de Transmile">
+        <div class="form-container">
+            <input type="text" id="user" placeholder="Nombre de Usuario">
+            <input type="text" id="plate" placeholder="Placa Asignada" readonly>
+            <button onclick="registerUser()">REGISTRAR USUARIO</button>
+            <a href="#" class="btn-back" onclick="goBack()">VOLVER</a>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@latest/bundles/stomp.umd.min.js"></script>
-    <script src="bus.js"></script>
-    <script src="app.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
