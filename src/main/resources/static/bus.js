@@ -1,17 +1,14 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-let buses = {};
-
 function drawBuses() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    console.log("🚌 Dibujando buses, total:", Object.keys(buses).length);
+    console.log(buses); // ✅ Muestra los buses en consola
+
     Object.values(buses).forEach(bus => {
-        // 🚍 Carrocería
         ctx.fillStyle = "yellow";
         ctx.fillRect(bus.x, bus.y, bus.width, bus.height);
 
-        // 🔲 Ventanas
+        // 🖼 Ventanas
         ctx.fillStyle = "blue";
         ctx.fillRect(bus.x + 5, bus.y + 5, 10, 10);
         ctx.fillRect(bus.x + 20, bus.y + 5, 10, 10);

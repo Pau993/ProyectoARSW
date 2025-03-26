@@ -32,6 +32,9 @@ function connectWebSocket() {
         onConnect: () => {
             console.log("✅ Conectado al servidor WebSocket");
             alert("Conectado al WebSocket correctamente.");
+            
+            // Guardar estado de conexión
+            sessionStorage.setItem("wsConnected", "true");
         },
         onStompError: (frame) => {
             console.error("❌ Error en WebSocket:", frame);
@@ -40,6 +43,7 @@ function connectWebSocket() {
 
     window.client.activate();
 }
+
 
 function showRegisterPlate() {
     document.getElementById('main-view').style.display = 'none';
@@ -73,6 +77,11 @@ function registerUser() {
     const user = document.getElementById('user').value;
     if (!user) {
         alert("Por favor, ingresa tu nombre de usuario.");
+        return;
+    }
+
+    if (!window.client || !window.client.connected) {
+        alert("❌ No puedes jugar sin estar conectado al WebSocket.");
         return;
     }
 
