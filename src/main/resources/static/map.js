@@ -30,15 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
 function drawMap() {
     const width = window.canvas.width;
     const height = window.canvas.height;
+    const roadSize = 40; // Aumenta el tamaño de las carreteras
 
     // Carreteras horizontales
     for (let y = 100; y < height; y += 200) {
-        drawRoad(0, y, width, 20);
+        drawRoad(0, y, width, roadSize);
     }
 
     // Carreteras verticales
     for (let x = 100; x < width; x += 200) {
-        drawRoad(x, 0, 20, height);
+        drawRoad(x, 0, roadSize, height);
     }
 }
 
@@ -72,9 +73,10 @@ function drawBus() {
 }
 
 function isOnRoad(x, y) {
+    const roadSize = 40; // Tamaño de las carreteras
     // Verificar si el bus está en una carretera horizontal o vertical
-    const onHorizontalRoad = (y % 200 >= 100 && y % 200 <= 120);
-    const onVerticalRoad = (x % 200 >= 100 && x % 200 <= 120);
+    const onHorizontalRoad = (y % 200 >= 100 && y % 200 <= 100 + roadSize);
+    const onVerticalRoad = (x % 200 >= 100 && x % 200 <= 100 + roadSize);
 
     return onHorizontalRoad || onVerticalRoad;
 }
