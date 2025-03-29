@@ -8,8 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.ctx = canvas.getContext("2d"); // Hacer `ctx` accesible globalmente
-});
+    window.canvas = canvas; // Hacer `canvas` accesible globalmente
 
+    drawMap(); // Dibujar el mapa inicialmente
+});
 
 function drawBuses() {
     if (!window.ctx || !window.canvas) {
@@ -20,8 +22,11 @@ function drawBuses() {
     // Limpiar el canvas antes de dibujar
     window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
 
+    // Redibujar el mapa
+    drawMap();
+
     console.log("🚌 Dibujando buses, total:", Object.keys(buses).length);
-    console.log(buses); // ✅ Muestra los buses en consola
+    console.log(buses);
 
     Object.values(buses).forEach(bus => {
         // 🚌 Cuerpo del bus
@@ -44,4 +49,3 @@ function drawBuses() {
         });
     });
 }
-
