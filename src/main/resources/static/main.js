@@ -90,7 +90,7 @@ function registerUser() {
 
     // Guardar usuario y placa en localStorage
     localStorage.setItem("username", user);
-    localStorage.setItem("plate", plate);
+    localStorage.setItem("playerId", plate);
 
     // Redirigir al juego
     window.location.href = "game.html";
