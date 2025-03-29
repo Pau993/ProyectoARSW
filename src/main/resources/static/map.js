@@ -6,26 +6,40 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    window.ctx = canvas.getContext("2d"); // Hacer `ctx` accesible globalmente
-    window.canvas = canvas; // Hacer `canvas` accesible globalmente
+    window.ctx = canvas.getContext("2d");
+    window.canvas = canvas;
 
-    drawMap(); // Dibujar el mapa inicialmente
+    // Función para ajustar el tamaño del canvas y redibujar el mapa
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        drawMap();
+        drawBus();
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Inicializar el bus
+    window.bus = { x: 110, y: 110, width: 30, height: 20 };
+
+    // Mover el bus con las teclas de flecha
+    document.addEventListener('keydown', moveBus);
 });
 
 function drawMap() {
+    const width = window.canvas.width;
+    const height = window.canvas.height;
+
     // Carreteras horizontales
-    drawRoad(0, 100, 1000, 20);
-    drawRoad(0, 300, 1000, 20);
-    drawRoad(0, 500, 1000, 20);
-    drawRoad(0, 700, 1000, 20);
-    drawRoad(0, 900, 1000, 20);
+    for (let y = 100; y < height; y += 200) {
+        drawRoad(0, y, width, 20);
+    }
 
     // Carreteras verticales
-    drawRoad(100, 0, 20, 1000);
-    drawRoad(300, 0, 20, 1000);
-    drawRoad(500, 0, 20, 1000);
-    drawRoad(700, 0, 20, 1000);
-    drawRoad(900, 0, 20, 1000);
+    for (let x = 100; x < width; x += 200) {
+        drawRoad(x, 0, 20, height);
+    }
 }
 
 function drawRoad(x, y, width, height) {
@@ -49,5 +63,48 @@ function drawRoad(x, y, width, height) {
         window.ctx.moveTo(x + width / 2, y);
         window.ctx.lineTo(x + width / 2, y + height);
         window.ctx.stroke();
+    }
+}
+
+function drawBus() {
+    window.ctx.fillStyle = 'yellow';
+    window.ctx.fillRect(window.bus.x, window.bus.y, window.bus.width, window.bus.height);
+}
+
+function isOnRoad(x, y) {
+    // Verificar si el bus está en una carretera horizontal o vertical
+    const onHorizontalRoad = (y % 200 >= 100 && y % 200 <= 120);
+    const onVerticalRoad = (x % 200 >= 100 && x % 200 <= 120);
+
+    return onHorizontalRoad || onVerticalRoad;
+}
+
+function moveBus(event) {
+    const step = 10;
+    let newX = window.bus.x;
+    let newY = window.bus.y;
+
+    switch (event.key) {
+        case 'ArrowUp':
+            newY -= step;
+            break;
+        case 'ArrowDown':
+            newY += step;
+            break;
+        case 'ArrowLeft':
+            newX -= step;
+            break;
+        case 'ArrowRight':
+            newX += step;
+            break;
+    }
+
+    // Verificar si la nueva posición está en la carretera
+    if (isOnRoad(newX, newY)) {
+        window.bus.x = newX;
+        window.bus.y = newY;
+        window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
+        drawMap();
+        drawBus();
     }
 }

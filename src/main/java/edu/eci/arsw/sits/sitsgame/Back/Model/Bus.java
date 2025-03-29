@@ -34,12 +34,27 @@ public class Bus implements Runnable {
         this.direction = direction;
     }
 
+    private boolean isOnRoad(int newX, int newY) {
+        boolean onHorizontalRoad = (newY % 200 >= 100 && newY % 200 <= 120);
+        boolean onVerticalRoad = (newX % 200 >= 100 && newX % 200 <= 120);
+
+        return onHorizontalRoad || onVerticalRoad;
+    }
+
     public void move() {
+        int newX = x;
+        int newY = y;
+
         switch (direction) {
-            case "UP": y -= speed; break;
-            case "DOWN": y += speed; break;
-            case "LEFT": x -= speed; break;
-            case "RIGHT": x += speed; break;
+            case "UP": newY -= speed; break;
+            case "DOWN": newY += speed; break;
+            case "LEFT": newX -= speed; break;
+            case "RIGHT": newX += speed; break;
+        }
+
+        if (isOnRoad(newX, newY)) {
+            x = newX;
+            y = newY;
         }
     }
 
@@ -54,13 +69,11 @@ public class Bus implements Runnable {
     @Override
     public void run() {
         while (running) {
-            move(); // Mueve el bus automáticamente
-
-            // 🔄 Enviar la posición actual a todas las pestañas
+            move();
             messagingTemplate.convertAndSend("/topic/game", "BUS:" + playerId + "," + x + "," + y);
 
             try {
-                Thread.sleep(100); // 🚀 Movimiento cada 100ms
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
