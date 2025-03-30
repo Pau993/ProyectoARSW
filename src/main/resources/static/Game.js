@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.canvas = canvas; // Hacer `canvas` accesible globalmente
     window.ctx = canvas.getContext("2d"); // Hacer `ctx` accesible globalmente
 
-    console.log ("Canvas incializado")
+    console.log("Canvas inicializado")
     
     // Verificar si la conexión WebSocket está guardada en sessionStorage
     if (sessionStorage.getItem("wsConnected") !== "true") {
@@ -23,6 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ Conexión WebSocket detectada en sessionStorage. Intentando reconectar...");
     reconnectWebSocket();
 });
+
+// Función para ajustar la posición del bus en el canvas
+function adjustBusPosition(bus) {
+    const canvasWidth = 1000;
+    const canvasHeight = 1000;
+
+    // Ajuste horizontal
+    if (bus.x < 0) bus.x = canvasWidth - bus.width;
+    if (bus.x > canvasWidth) bus.x = 0;
+
+    // Ajuste vertical
+    if (bus.y < 0) bus.y = canvasHeight - bus.height;
+    if (bus.y > canvasHeight) bus.y = 0;
+
+    // Opcional: Alinear con la cuadrícula de carreteras
+    const tileSize = 100;
+    bus.x = Math.floor(bus.x / tileSize) * tileSize + (tileSize - bus.width) / 2;
+    bus.y = Math.floor(bus.y / tileSize) * tileSize + (tileSize - bus.height) / 2;
+}
 
 function reconnectWebSocket() {
     const socket = new SockJS("http://localhost:8080/ws");
@@ -67,17 +86,20 @@ function suscribirEventos() {
             if (data[0] === "NEW_BUS") {
                 const [id, x, y] = data[1].split(",");
                 buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30 };
+                adjustBusPosition(buses[id]);
             } else if (data[0] === "ALL_BUSES") {
                 buses = {}; // Reiniciar lista de buses
                 for (let i = 1; i < data.length; i++) {
                     const [id, x, y] = data[i].split(",");
                     buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30 };
+                    adjustBusPosition(buses[id]);
                 }
             } else if (data[0] === "BUS") {
                 const [id, x, y] = data[1].split(",");
                 if (buses[id]) {
                     buses[id].x = parseInt(x);
                     buses[id].y = parseInt(y);
+                    adjustBusPosition(buses[id]);
                 }
             }
         });
