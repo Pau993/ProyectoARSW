@@ -1,73 +1,84 @@
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const tileSize = 100; // Tamaño de cada tile
-    const mapSize = 10; // Tamaño del mapa (10x10)
+    const tileSize = 200; // Tamaño de cada tile
+    const mapSize = 5; // Tamaño del mapa (5x5)
     
-    // Nuevo: Ancho de carretera más grande
-    const roadWidth = 60; // Ancho total de la carretera
-    const laneWidth = 25; // Ancho de cada carril
+    const busWidth = 50; // Ancho de un autobús
+    const roadWidth = busWidth * 2; // Ancho total de la carretera para dos autobuses
+    const laneWidth = busWidth; // Ancho de cada carril
     const centerLineWidth = 5; // Ancho de la línea central
-
-    // Fondo verde
     ctx.fillStyle = '#90EE90'; // Verde claro
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Función para dibujar carretera
-    function drawRoad(x, y, horizontal, vertical, hasLines = true) {
+    function drawRoad(x, y, horizontal, vertical) {
         // Color base de la carretera
         ctx.fillStyle = '#4a4a4a'; // Gris más oscuro
 
         // Dibujar carretera base
         if (horizontal) {
-            // Carretera horizontal más ancha
             ctx.fillRect(x, y + (tileSize - roadWidth) / 2, tileSize, roadWidth);
         }
         if (vertical) {
-            // Carretera vertical más ancha
             ctx.fillRect(x + (tileSize - roadWidth) / 2, y, roadWidth, tileSize);
         }
 
         // Dibujar líneas divisorias
-        if (hasLines) {
-            ctx.strokeStyle = '#FFFFFF'; // Línea blanca
-            ctx.lineWidth = 3;
-            
-            // Línea central discontinua
-            ctx.setLineDash([20, 20]);
+        ctx.strokeStyle = '#FFFFFF'; // Línea blanca
+        ctx.lineWidth = 3;
+        ctx.setLineDash([20, 20]); // Línea discontinua
 
-            if (horizontal) {
-                // Línea central horizontal
-                ctx.beginPath();
-                ctx.moveTo(x, y + tileSize / 2);
-                ctx.lineTo(x + tileSize, y + tileSize / 2);
-                ctx.stroke();
-            }
-            
-            if (vertical) {
-                // Línea central vertical
-                ctx.beginPath();
-                ctx.moveTo(x + tileSize / 2, y);
-                ctx.lineTo(x + tileSize / 2, y + tileSize);
-                ctx.stroke();
-            }
+        if (horizontal) {
+            // Líneas de carril horizontales
+            ctx.beginPath();
+            ctx.moveTo(x, y + tileSize / 2 - laneWidth / 2);
+            ctx.lineTo(x + tileSize, y + tileSize / 2 - laneWidth / 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x, y + tileSize / 2 + laneWidth / 2);
+            ctx.lineTo(x + tileSize, y + tileSize / 2 + laneWidth / 2);
+            ctx.stroke();
+
+            // Línea central amarilla
+            ctx.strokeStyle = '#FFD700'; // Amarillo
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.moveTo(x, y + tileSize / 2);
+            ctx.lineTo(x + tileSize, y + tileSize / 2);
+            ctx.stroke();
+        }
+        
+        if (vertical) {
+            // Líneas de carril verticales
+            ctx.beginPath();
+            ctx.moveTo(x + tileSize / 2 - laneWidth / 2, y);
+            ctx.lineTo(x + tileSize / 2 - laneWidth / 2, y + tileSize);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x + tileSize / 2 + laneWidth / 2, y);
+            ctx.lineTo(x + tileSize / 2 + laneWidth / 2, y + tileSize);
+            ctx.stroke();
+
+            // Línea central amarilla
+            ctx.strokeStyle = '#FFD700'; // Amarillo
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.moveTo(x + tileSize / 2, y);
+            ctx.lineTo(x + tileSize / 2, y + tileSize);
+            ctx.stroke();
         }
     }
 
     // Generar todas las carreteras
     const roadPositions = [];
 
-    // Carreteras horizontales en todas las filas
-    for (let y = 0; y < mapSize; y++) {
-        for (let x = 0; x < mapSize; x++) {
-            roadPositions.push({x, y, horizontal: true, vertical: false});
-        }
-    }
-
-    // Carreteras verticales en todas las columnas
+    // Carreteras horizontales y verticales en todas las posiciones
     for (let x = 0; x < mapSize; x++) {
         for (let y = 0; y < mapSize; y++) {
-            roadPositions.push({x, y, horizontal: false, vertical: true});
+            roadPositions.push({x, y, horizontal: true, vertical: true});
         }
     }
 
@@ -80,18 +91,6 @@ function createMap() {
             road.vertical
         );
     });
-
-    // Intersecciones (todas las combinaciones)
-    for (let x = 0; x < mapSize; x++) {
-        for (let y = 0; y < mapSize; y++) {
-            drawRoad(
-                x * tileSize, 
-                y * tileSize, 
-                true, 
-                true
-            );
-        }
-    }
 }
 
 // Llamar a createMap cuando la página se cargue
