@@ -1,10 +1,10 @@
 window.buses = {}; // Objeto para almacenar los buses
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🔍 Verificando conexión WebSocket...");
+    console.log("Verificando conexión WebSocket...");
     const canvas = document.getElementById("gameCanvas");
     if (!canvas) {
-        console.error("❌ Error: No se encontró el canvas 'gameCanvas'.");
+        console.error("Error: No se encontró el canvas 'gameCanvas'.");
         return;
     }
     window.canvas = canvas; // Hacer `canvas` accesible globalmente
@@ -14,13 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Verificar si la conexión WebSocket está guardada en sessionStorage
     if (sessionStorage.getItem("wsConnected") !== "true") {
-        console.error("❌ No hay conexión WebSocket guardada.");
-        alert("❌ No estás conectado al WebSocket. Regresando a la página principal.");
+        console.error("No hay conexión WebSocket guardada.");
+        alert("No estás conectado al WebSocket. Regresando a la página principal.");
         window.location.href = "index.html";
         return;
     }
 
-    console.log("✅ Conexión WebSocket detectada en sessionStorage. Intentando reconectar...");
+    console.log("Conexión WebSocket detectada en sessionStorage. Intentando reconectar...");
     reconnectWebSocket();
 });
 
@@ -49,35 +49,35 @@ function reconnectWebSocket() {
         webSocketFactory: () => socket,
         debug: (str) => console.log(str),
         onConnect: () => {
-            console.log("✅ Reconectado al servidor WebSocket en game.js");
+            console.log("Reconectado al servidor WebSocket en game.js");
 
-            // 🚀 Recuperar playerId desde localStorage
+            // Recuperar playerId desde localStorage
             window.playerId = localStorage.getItem("playerId");
             if (!window.playerId) {
-                console.error("❌ No se encontró playerId en localStorage.");
+                console.error("No se encontró playerId en localStorage.");
                 alert("No se encontró un ID de jugador. Volviendo al menú.");
                 window.location.href = "index.html";
                 return;
             }
 
-            suscribirEventos(); // 📩 Suscribirse al WebSocket
+            suscribirEventos(); // Suscribirse al WebSocket
         },
         onStompError: (frame) => {
-            console.error("❌ Error en WebSocket:", frame);
+            console.error("Error en WebSocket:", frame);
         }
     });
     window.client.activate();
 }
 
 function suscribirEventos() {
-    const playerId = window.playerId; // ✅ Usar playerId correctamente
+    const playerId = window.playerId; // Usar playerId correctamente
     if (!playerId) {
-        console.error("❌ Error: playerId no definido.");
+        console.error(" Error: playerId no definido.");
         return;
     }
 
     window.client.subscribe("/topic/game", (message) => {
-        console.log("📩 Mensaje recibido del servidor:", message.body);
+        console.log(" Mensaje recibido del servidor:", message.body);
 
         const lines = message.body.split("\n");
         lines.forEach(line => {
@@ -108,10 +108,10 @@ function suscribirEventos() {
     });
 
     // Enviar solicitud para unirse al juego
-    console.log("📤 Enviando solicitud de conexión para", playerId);
+    console.log("Enviando solicitud de conexión para", playerId);
     window.client.publish({ destination: "/app/join", body: playerId });
 
-    // 🎮 Capturar teclas y cambiar dirección
+    // Capturar teclas y cambiar dirección
     document.addEventListener("keydown", (event) => {
         let direction = null;
         switch (event.key) {
@@ -121,7 +121,7 @@ function suscribirEventos() {
             case "ArrowRight": direction = "RIGHT"; break;
         }
         if (direction && window.client.connected) {
-            console.log("📤 Enviando movimiento:", direction);
+            console.log(" Enviando movimiento:", direction);
             window.client.publish({ destination: "/app/move", body: playerId + ":" + direction });
         }
     });

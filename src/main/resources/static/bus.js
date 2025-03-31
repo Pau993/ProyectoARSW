@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("gameCanvas");
 
     if (!canvas) {
-        console.error("❌ Error: No se encontró el canvas 'gameCanvas'.");
+        console.error("Error: No se encontró el canvas 'gameCanvas'.");
         return;
     }
 
@@ -15,30 +15,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function drawBuses() {
     if (!window.ctx || !window.canvas) {
-        console.error("❌ Error: El canvas o el contexto no están inicializados.");
+        console.error("Error: El canvas o el contexto no están inicializados.");
         return;
     }
 
-    console.log("🚌 Dibujando buses, total:", Object.keys(buses).length);
-    console.log(buses); // ✅ Muestra los buses en consola
+    console.log("Dibujando buses, total:", Object.keys(buses).length);
+    console.log(buses); // Muestra los buses en consola
 
     // Redibujar el mapa completo antes de dibujar los buses
     createMap();
 
     // Dibujar nuevos buses
     Object.values(buses).forEach(bus => {
-        // 🚌 Cuerpo del bus
+        // Cuerpo del bus
         window.ctx.fillStyle = "yellow";
         window.ctx.fillRect(bus.x, bus.y, bus.width, bus.height);
 
-        // 🖼 Ventanas del bus
+        // Ventanas del bus
         window.ctx.fillStyle = "blue";
         const windowPositions = [5, 20, 35];
         windowPositions.forEach(offset => {
             window.ctx.fillRect(bus.x + offset, bus.y + 5, 10, 10);
         });
 
-        // ⚫ Ruedas del bus
+        // Ruedas del bus
         window.ctx.fillStyle = "black";
         [10, 40].forEach(offset => {
             window.ctx.beginPath();

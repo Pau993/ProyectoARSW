@@ -7,15 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body onload="showRulesAlert()">
     <!-- Vista principal -->
     <div id="main-view">
-        <img src="transmi.jpg" alt="Imagen representativa de Transmile">
+        <img src="transmi.jpg" alt="Imagen representativa de Transmilenio">
         <h1>SISTEMA INTEGRADO DE SUPERVIVENCIA</h1>
         <div class="btn-container">
             <button id="connectBtn" class="btn">Conectar al WebSocket</button>
             <button class="btn" onclick="showRegisterPlate()">Registrar Placa</button>
             <button class="btn" onclick="openSettings()">Configuraciones</button>
+            <button class="btn" onclick="redirectToRules()">Reglas de juego</button>
         </div>
     </div>
 
@@ -34,6 +35,15 @@
     <!-- 🔹 Incluir librerías necesarias antes de `main.js` -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@latest/bundles/stomp.umd.min.js"></script>
+    <script>
+        function showRulesAlert() {
+            alert("Por favor, si es la primera vez que accedes al juego, revisa las reglas del sistema.");
+        }
+
+        function redirectToRules() {
+            window.location.href = "rules.html";
+        }
+    </script>
     <script src="main.js"></script>
 </body>
 </html>

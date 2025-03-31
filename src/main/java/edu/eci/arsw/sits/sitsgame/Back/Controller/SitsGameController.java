@@ -38,7 +38,7 @@ public class SitsGameController {
 
             buses.put(playerId, newBus);
             busThreads.put(playerId, busThread);
-            busThread.start(); // 🚀 Inicia el hilo del bus
+            busThread.start(); // Inicia el hilo del bus
         }
 
         // Notificar a todas las pestañas sobre el nuevo bus

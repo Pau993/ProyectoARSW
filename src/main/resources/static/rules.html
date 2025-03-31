@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reglas del Juego</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            text-align: center;
+            background-color: #ff3636;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .rule-box {
+            background: #701111;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #000000;
+        }
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #800000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Reglas del Juego</h1>
+        
+        <div class="rule-box">
+            <h2>Movimientos</h2>
+            <p>El jugador puede mover su bus en diferentes direcciones, seguir rutas y esquivar obstáculos para optimizar su tiempo.</p>
+        </div>
+
+        <div class="rule-box">
+            <h2>Recolección de Pasajeros</h2>
+            <p>Los pasajeros aparecen en puntos específicos del mapa. El jugador debe detenerse correctamente en las paradas para recogerlos. Cada bus tiene una capacidad máxima de pasajeros.</p>
+        </div>
+
+        <div class="rule-box">
+            <h2>Obstáculos y Penalizaciones</h2>
+            <p>Chocar con obstáculos reduce la cantidad de pasajeros.</p>
+        </div>
+
+        <div class="rule-box">
+            <h2>Condiciones de Derrota</h2>
+            <p>Si el tiempo límite se acaba sin cumplir el objetivo o si pierde todos sus pasajeros.</p>
+        </div>
+
+        <div class="rule-box">
+            <h2>Reinicio o Fin del Juego</h2>
+            <p>Al perder, el jugador puede reiniciar la partida o regresar al menú principal.</p>
+        </div>
+
+        <div class="rule-box">
+            <div class="level">
+                <h2>Progresión de Niveles</h2>
+                <p>El primer nivel del jugador es un alimentador hasta recoger 10/10 pasajeros.</p>
+                <p>El segundo nivel del jugador es un SITP, hasta recoger 20/20 pasajeros.</p>
+                <p>El último nivel, el jugador será un Transmilenio y ganará cuando haya recogido 30/30 pasajeros.</p>
+            </div>
+        </div>
+        
+        <a href="index.html" class="btn-back">VOLVER</a>
+    </div>
+</body>
+</html>
