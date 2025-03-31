@@ -14,6 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function drawBuses() {
+    console.log("Datos actuales de buses:", buses);
+    // Verificar si el canvas y el contexto están inicializados
+    if (!buses) {
+        console.error("Error: No hay datos de buses disponibles.");
+        return;
+    }
     if (!window.ctx || !window.canvas) {
         console.error("Error: El canvas o el contexto no están inicializados.");
         return;
