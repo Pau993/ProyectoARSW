@@ -92,6 +92,11 @@ function registerUser() {
     localStorage.setItem("username", user);
     localStorage.setItem("playerId", plate);
 
-    // Redirigir al juego
+    const startGameBtn = document.getElementById('startGameBtn');
+    startGameBtn.style.display = 'block';
+}
+
+function startGame() {
+    // Redirigir al usuario al juego
     window.location.href = "game.html";
 }
