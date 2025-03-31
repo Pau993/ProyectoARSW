@@ -26,7 +26,7 @@ function drawBuses() {
     createMap();
 
     // Dibujar nuevos buses
-    Object.values(buses).forEach(bus => {
+    Object.entries(buses).forEach(([id, bus]) => {
         // Cuerpo del bus
         window.ctx.fillStyle = "yellow";
         window.ctx.fillRect(bus.x, bus.y, bus.width, bus.height);
@@ -45,5 +45,11 @@ function drawBuses() {
             window.ctx.arc(bus.x + offset, bus.y + bus.height, 5, 0, Math.PI * 2);
             window.ctx.fill();
         });
+
+        // Dibujar la placa encima del bus
+        window.ctx.fillStyle = "black";
+        window.ctx.font = "14px Arial";
+        window.ctx.textAlign = "center";
+        window.ctx.fillText(id, bus.x + bus.width / 2, bus.y - 5);
     });
 }
