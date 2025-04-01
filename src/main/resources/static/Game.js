@@ -53,9 +53,11 @@ function reconnectWebSocket() {
 }
 
 function suscribirEventos() {
-    const playerId = window.playerId; // Usar playerId correctamente
+    const playerId = window.playerId || localStorage.getItem("playerId");
+
+    // Verificar si playerId está definido
     if (!playerId) {
-        console.error("Error: playerId no definido.");
+        console.error("Error: playerId no definido. Asegúrate de que el usuario esté registrado.");
         return;
     }
 
@@ -68,12 +70,17 @@ function suscribirEventos() {
 
             if (data[0] === "NEW_BUS") {
                 const [id, x, y, plate] = data[1].split(",");
-                buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: 0, plate: plate };
+                if (plate && plate !== "") {
+                    buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: 0, plate: plate };
+                    console.log(`Nuevo bus registrado: ID=${id}, X=${x}, Y=${y}, Placa=${plate}`);
+                }
             } else if (data[0] === "ALL_BUSES") {
                 buses = {}; // Reiniciar solo la lista global de buses
                 for (let i = 1; i < data.length; i++) {
-                    const [id, x, y, angle, plate] = data[i].split(",");
-                    buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: parseFloat(angle), plate: plate };
+                    const [id, plate, x, y, direction] = data[i].split(",");
+                    if (plate && plate !== "") { // Asegurarse de que solo se añaden buses con placas
+                        buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: direction === "LEFT" || direction === "RIGHT" ? 0 : 90, plate: plate };
+                    }
                 }
             } else if (data[0] === "BUS") {
                 const [id, x, y, angle, plate] = data[1].split(",");
@@ -86,7 +93,7 @@ function suscribirEventos() {
             }
         });
 
-        drawBuses();
+        drawBuses(); // Dibujar solo los buses con placas
     });
 
     // Enviar solicitud para unirse al juego

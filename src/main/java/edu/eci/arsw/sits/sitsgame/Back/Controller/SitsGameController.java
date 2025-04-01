@@ -1,6 +1,7 @@
 package edu.eci.arsw.sits.sitsgame.Back.Controller;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -30,9 +31,8 @@ public class SitsGameController {
 
     @MessageMapping("/join")
     @SendTo("/topic/game")
-    public String handleNewPlayer(String playerId) {
+    public synchronized String handleNewPlayer(String playerId) {
         if (!buses.containsKey(playerId)) {
-            // Alternar entre dos posiciones iniciales dentro de la carretera
             boolean startOnLeft = buses.size() % 2 == 0;
             int laneOffset = (TILE_SIZE - ROAD_WIDTH) / 2;
             int randomLane = random.nextBoolean() ? laneOffset : laneOffset + BUS_SIZE;
@@ -42,17 +42,17 @@ public class SitsGameController {
             String direction;
 
             if (startOnLeft) {
-                randomX = 0;  // Aparece en la izquierda (sobre la carretera)
+                randomX = 0;
                 randomY = (random.nextInt(5) * TILE_SIZE) + randomLane;
-                direction = "RIGHT";  // Se mueve hacia la derecha
+                direction = "RIGHT";
             } else {
-                randomX = MAP_WIDTH - BUS_SIZE;  // Aparece en la derecha
+                randomX = MAP_WIDTH - BUS_SIZE;
                 randomY = (random.nextInt(5) * TILE_SIZE) + randomLane;
-                direction = "LEFT";  // Se mueve hacia la izquierda
+                direction = "LEFT";
             }
 
             Bus newBus = new Bus(playerId, direction, randomX, randomY, messagingTemplate);
-            newBus.setDirection(direction); // Asignar dirección inicial
+            newBus.setDirection(direction);
             Thread busThread = new Thread(newBus);
 
             buses.put(playerId, newBus);
@@ -60,10 +60,8 @@ public class SitsGameController {
             busThread.start();
         }
 
-        // Notificar a todas las pestañas sobre el nuevo bus
-        String newBusMessage = "NEW_BUS:" + playerId + "," + buses.get(playerId).getX() + "," + buses.get(playerId).getY() + "," + buses.get(playerId).getDirection();
+        removeInactiveBuses(); // Eliminar buses huérfanos
 
-        // Enviar TODA la lista de buses para sincronizar
         StringBuilder allBusesMessage = new StringBuilder("ALL_BUSES");
         for (Bus bus : buses.values()) {
             allBusesMessage.append(":")
@@ -73,23 +71,34 @@ public class SitsGameController {
                 .append(bus.getDirection());
         }
 
-        return newBusMessage + "\n" + allBusesMessage;
+        return allBusesMessage.toString();
     }
 
     @MessageMapping("/move")
-    public void changeBusDirection(String message) {
+    public synchronized void changeBusDirection(String message) {
         String[] parts = message.split(":");
+        if (parts.length < 2) return;
+
         String playerId = parts[0];
         String direction = parts[1];
 
         if (buses.containsKey(playerId)) {
             Bus bus = buses.get(playerId);
 
-            // Validar movimiento en la carretera
             if (isValidMove(bus, direction)) {
-                bus.setDirection(direction); // Cambia la dirección del bus
-                bus.allowMove(); // Permitir que el bus se mueva
-                bus.move(); // Mover el bus inmediatamente
+                bus.setDirection(direction);
+                bus.allowMove();
+                bus.move();
+            }
+        }
+    }
+
+    private synchronized void removeInactiveBuses() {
+        Iterator<Map.Entry<String, Bus>> iterator = buses.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Bus> entry = iterator.next();
+            if (!busThreads.containsKey(entry.getKey())) {
+                iterator.remove();
             }
         }
     }
