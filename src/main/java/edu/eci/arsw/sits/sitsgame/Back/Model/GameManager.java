@@ -33,8 +33,6 @@ public class GameManager {
     }
 
     public static void removeInactiveBuses() {
-        // Implementar lógica para remover buses inactivos si es necesario
-        // Ejemplo: iterar sobre los buses y verificar si están inactivos
         buses.entrySet().removeIf(entry -> {
             String playerId = entry.getKey();
             Thread busThread = busThreads.get(playerId);
