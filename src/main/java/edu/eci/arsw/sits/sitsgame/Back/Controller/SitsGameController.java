@@ -12,11 +12,9 @@ import org.springframework.stereotype.Controller;
 
 import edu.eci.arsw.sits.sitsgame.Back.Model.Bus;
 
-
-
 @Controller
 public class SitsGameController {
-    
+
     private final Map<String, Bus> buses = new HashMap<>();
     private final Map<String, Thread> busThreads = new HashMap<>();
     private final Random random = new Random();
@@ -41,16 +39,12 @@ public class SitsGameController {
             busThread.start(); // Inicia el hilo del bus
         }
 
-        // Notificar a todas las pestañas sobre el nuevo bus
-        String newBusMessage = "NEW_BUS:" + playerId + "," + buses.get(playerId).getX() + "," + buses.get(playerId).getY();
+        // Notificar solo el bus recién creado al jugador
+        String newBusMessage = "NEW_BUS:" + playerId + "," + buses.get(playerId).getX() + ","
+                + buses.get(playerId).getY();
 
-        // Enviar TODA la lista de buses para sincronizar
-        StringBuilder allBusesMessage = new StringBuilder("ALL_BUSES");
-        for (Bus bus : buses.values()) {
-            allBusesMessage.append(":").append(bus.getPlayerId()).append(",").append(bus.getX()).append(",").append(bus.getY());
-        }
-
-        return newBusMessage + "\n" + allBusesMessage;
+        // El cliente solo recibirá el mensaje del bus recién creado
+        return newBusMessage;
     }
 
     @MessageMapping("/move")

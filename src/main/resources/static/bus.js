@@ -59,3 +59,5 @@ function drawBuses() {
         window.ctx.fillText(id, bus.x + bus.width / 2, bus.y - 5);
     });
 }
+
+
