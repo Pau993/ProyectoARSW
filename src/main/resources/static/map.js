@@ -3,34 +3,30 @@ function createMap() {
     const ctx = canvas.getContext('2d');
     const tileSize = 200; // Tamaño de cada tile
     const mapSize = 5; // Tamaño del mapa (5x5)
-    
+
+    const gridWidth = mapSize;
+    const gridHeight = mapSize;
+
     const busWidth = 50; // Ancho de un autobús
     const roadWidth = busWidth * 2; // Ancho total de la carretera para dos autobuses
     const laneWidth = busWidth; // Ancho de cada carril
-    const centerLineWidth = 5; // Ancho de la línea central
-    ctx.fillStyle = '#90EE90'; // Verde claro
+
+    ctx.fillStyle = '#90EE90'; // Verde claro (césped)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Función para dibujar carretera
+
+    // Dibujar carretera
     function drawRoad(x, y, horizontal, vertical) {
-        // Color base de la carretera
-        ctx.fillStyle = '#4a4a4a'; // Gris más oscuro
+        ctx.fillStyle = '#4a4a4a'; // Gris oscuro para la carretera
 
-        // Dibujar carretera base
-        if (horizontal) {
-            ctx.fillRect(x, y + (tileSize - roadWidth) / 2, tileSize, roadWidth);
-        }
-        if (vertical) {
-            ctx.fillRect(x + (tileSize - roadWidth) / 2, y, roadWidth, tileSize);
-        }
+        if (horizontal) ctx.fillRect(x, y + (tileSize - roadWidth) / 2, tileSize, roadWidth);
+        if (vertical) ctx.fillRect(x + (tileSize - roadWidth) / 2, y, roadWidth, tileSize);
 
-        // Dibujar líneas divisorias
-        ctx.strokeStyle = '#FFFFFF'; // Línea blanca
+        ctx.strokeStyle = '#FFFFFF'; // Líneas de carril blancas
         ctx.lineWidth = 3;
-        ctx.setLineDash([20, 20]); // Línea discontinua
+        ctx.setLineDash([20, 20]);
 
         if (horizontal) {
-            // Líneas de carril horizontales
             ctx.beginPath();
             ctx.moveTo(x, y + tileSize / 2 - laneWidth / 2);
             ctx.lineTo(x + tileSize, y + tileSize / 2 - laneWidth / 2);
@@ -41,17 +37,15 @@ function createMap() {
             ctx.lineTo(x + tileSize, y + tileSize / 2 + laneWidth / 2);
             ctx.stroke();
 
-            // Línea central amarilla
-            ctx.strokeStyle = '#FFD700'; // Amarillo
+            ctx.strokeStyle = '#FFD700'; // Línea central amarilla
             ctx.setLineDash([]);
             ctx.beginPath();
             ctx.moveTo(x, y + tileSize / 2);
             ctx.lineTo(x + tileSize, y + tileSize / 2);
             ctx.stroke();
         }
-        
+
         if (vertical) {
-            // Líneas de carril verticales
             ctx.beginPath();
             ctx.moveTo(x + tileSize / 2 - laneWidth / 2, y);
             ctx.lineTo(x + tileSize / 2 - laneWidth / 2, y + tileSize);
@@ -62,8 +56,7 @@ function createMap() {
             ctx.lineTo(x + tileSize / 2 + laneWidth / 2, y + tileSize);
             ctx.stroke();
 
-            // Línea central amarilla
-            ctx.strokeStyle = '#FFD700'; // Amarillo
+            ctx.strokeStyle = '#FFD700'; // Línea central amarilla
             ctx.setLineDash([]);
             ctx.beginPath();
             ctx.moveTo(x + tileSize / 2, y);
@@ -72,168 +65,107 @@ function createMap() {
         }
     }
 
-    // Generar todas las carreteras
-    const roadPositions = [];
-
-    // Carreteras horizontales y verticales en todas las posiciones
+    // Dibujar carreteras en todas las posiciones
     for (let x = 0; x < mapSize; x++) {
         for (let y = 0; y < mapSize; y++) {
-            roadPositions.push({x, y, horizontal: true, vertical: true});
+            drawRoad(x * tileSize, y * tileSize, true, true);
         }
     }
 
-    // Dibujar todas las carreteras
-    roadPositions.forEach(road => {
-        drawRoad(
-            road.x * tileSize, 
-            road.y * tileSize, 
-            road.horizontal, 
-            road.vertical
-        );
-    });
+    // Función para dibujar un edificio con borde negro
+    function drawBuilding(x, y, color) {
+        let buildingSize = tileSize * 0.3;
+        let offset = (tileSize - buildingSize) / 2;
 
-    // Dibujar obstaculos (ejemplo: edificios cafes)
-    function drawBuilding(x, y) {
-        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
-        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+
+    // Colocar edificios en el mapa
+    const buildings = [
+        { x: 1.5, y: 0.5, color: '#F9C5D1' }, // Pastel Rosa Claro
+        { x: 1.5, y: 1.5, color: '#A8D0E6' }, // Pastel Azul Claro
+        { x: 1.5, y: 2.5, color: '#EEC9B7' }, // Pastel Melocotón Claro
+        { x: 1.5, y: 3.5, color: '#B9E3B6' }, // Pastel Verde Claro
+        { x: 1.5, y: 4.5, color: '#E6A3D9' }, // Pastel Lavanda
+        { x: 0.5, y: 0.5, color: '#FFD4DA' },  // Pastel Rosa Claro
+        { x: 0.5, y: 1.5, color: '#C0E8D5' },  // Pastel Aqua Suave
+        { x: 0.5, y: 2.5, color: '#F1C8B2' },  // Pastel Naranja Suave
+        { x: 0.5, y: 3.5, color: '#C7E5C6' },  // Pastel Verde Suave
+        { x: 0.5, y: 4.5, color: '#F6C9D7' },  // Pastel Coral Claro
+        { x: 2.5, y: 0.5, color: '#FFB4C0' },  // Pastel Rosa Suave
+        { x: 2.5, y: 1.5, color: '#B1D9D4' },  // Pastel Aqua Claro
+        { x: 2.5, y: 2.5, color: '#FFEBB7' },  // Pastel Amarillo Claro
+        { x: 2.5, y: 3.5, color: '#A2C9F3' },  // Pastel Azul Claro
+        { x: 2.5, y: 4.5, color: '#E8D0F2' },  // Pastel Lila Claro
+        { x: 3.5, y: 0.5, color: '#F6E3D6' },  // Pastel Beige
+        { x: 3.5, y: 1.5, color: '#C1D7E0' }, // Pastel Aqua Claro
+        { x: 3.5, y: 2.5, color: '#F8D0C4' }, // Pastel Rosado Claro
+        { x: 3.5, y: 3.5, color: '#C1D9E7' }, // Pastel Azul Suave
+        { x: 3.5, y: 4.5, color: '#D4A2D8' }, // Pastel Lila Claro
+        { x: 4.5, y: 0.5, color: '#FFD1E1' }, // Pastel Rosa Suave
+        { x: 4.5, y: 1.5, color: '#B6D8F6' }, // Pastel Azul Claro
+        { x: 4.5, y: 2.5, color: '#E4F2B7' }, // Pastel Verde Claro
+        { x: 4.5, y: 3.5, color: '#F0C2B6' }, // Pastel Naranja Claro
+        { x: 4.5, y: 4.5, color: '#D6B5E6' }, // Pastel Lavanda Claro
+        { x: -0.5, y: 0.5, color: '#F7D2A1' }, // Pastel Amarillo Claro
+        { x: -0.5, y: 1.5, color: '#F3D2E6' }, // Pastel Rosa Claro
+        { x: -0.5, y: 2.5, color: '#B6E2B3' }, // Pastel Verde Suave
+        { x: -0.5, y: 3.5, color: '#FFBC9A' }, // Pastel Naranja Claro
+        { x: -0.5, y: 4.5, color: '#FFBDC6' }, // Pastel Rojo Suave
+        { x: -0.5, y: -0.5, color: '#F2A3B7' }, // Pastel Rosa
+        { x: 0.5, y: -0.5, color: '#F9D6A0' }, // Pastel Amarillo Claro
+        { x: 1.5, y: -0.5, color: '#E4D4F3' }, // Pastel Lila Claro
+        { x: 2.5, y: -0.5, color: '#F8C3A1' }, // Pastel Melocotón Claro
+        { x: 3.5, y: -0.5, color: '#C9D9F7' }, // Pastel Azul Claro
+        { x: 4.5, y: -0.5, color: '#FFD9E1' }  // Pastel Rosa Suave
+    ];
     
-        let baseX = x * tileSize + offset;
-        let baseY = y * tileSize + offset;
-
-        // Dibujar el cuerpo del edificio
-        ctx.fillStyle = '#8B4513'; // Marrón
-        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
-
-        // Dibujar el borde negro
-        ctx.strokeStyle = '#000000'; // Negro
-        ctx.lineWidth = 2; // Grosor del borde
-        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
-    }
     
-    drawBuilding(1.5, 1.5); // Edificio en el centro
-    drawBuilding(3.5, 3.5);
-    drawBuilding(2.5, 4.5);
-    drawBuilding(-0.5, 0.5);
-    drawBuilding(4.5, 2.5);
-    drawBuilding(0.5, 3.5); // Edificio en la esquina
+    
+    buildings.forEach(building => drawBuilding(building.x, building.y, building.color));
 
-    function drawBuildingB(x, y){
-        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
-        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+    // Dibujar obstáculos circulares huecos (negros)
+    function drawHollowObstacle(x, y) {
+        let obstacleSize = tileSize * 0.2;
+        let centerX = x * tileSize + tileSize / 2;
+        let centerY = y * tileSize + tileSize / 2;
 
-        let baseX = x * tileSize + offset;
-        let baseY = y * tileSize + offset;
-
-        ctx.fillStyle = '#3B83BD'; // Marrón
-        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
-
-        // Dibujar el borde negro
-        ctx.strokeStyle = '#000000'; // Negro
-        ctx.lineWidth = 2; // Grosor del borde
-        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+        ctx.fillStyle = '#000000'; // Negro total
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, obstacleSize / 2, 0, Math.PI * 2);
+        ctx.fill();
     }
 
-    drawBuildingB(2.5, 2.5); // Edificio en el centro
-    drawBuildingB(3.5, 2.5);
-    drawBuildingB(-0.5, -0.5);
-    drawBuildingB(2.5, 3.5);
-    drawBuildingB(-0.5, 2.5);
-    drawBuildingB(4.5, 4.5);
-    drawBuildingB(0.5, 1.5); // Edificio en la esquina
+    // Generar huecos aleatorios en la carretera
+    function generateRandomHoles(count) {
+        let placedPositions = new Set();
 
-    function drawBuildingR(x, y){
-        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
-        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+        for (let i = 0; i < count; i++) {
+            let randomX, randomY, key;
+            do {
+                randomX = Math.floor(Math.random() * gridWidth);
+                randomY = Math.floor(Math.random() * gridHeight);
+                key = `${randomX},${randomY}`;
+            } while (
+                placedPositions.has(key) || 
+                buildings.some(b => b.x === randomX && b.y === randomY) // Evita edificios
+            );
 
-        let baseX = x * tileSize + offset;
-        let baseY = y * tileSize + offset;
-
-        ctx.fillStyle = '#FF0000'; // Rojo
-        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
-
-        // Dibujar el borde negro
-        ctx.strokeStyle = '#000000'; // Negro
-        ctx.lineWidth = 2; // Grosor del borde
-        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+            placedPositions.add(key);
+            drawHollowObstacle(randomX, randomY);
+        }
     }
-    drawBuildingR(0.5, 0.5); // Edificio en el centro
-    drawBuildingR(1.5, 0.5);
-    drawBuildingR(3.5, -0.5);
-    drawBuildingR(2.5, 2.5);
-    drawBuildingR(-0.5, 1.5);
-    drawBuildingR(4.5, 1.5);
-    drawBuildingR(2.5, 1.5); // Edificio en la esquina
 
-    function drawBuildingG(x, y){
-        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
-        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
-
-        let baseX = x * tileSize + offset;
-        let baseY = y * tileSize + offset;
-
-        ctx.fillStyle = '#008F39'; // Verde
-        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
-
-        // Dibujar el borde negro
-        ctx.strokeStyle = '#000000'; // Negro
-        ctx.lineWidth = 2; // Grosor del borde
-        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
-    }
-    drawBuildingG(1.5, 4.5); // Edificio en el centro
-    drawBuildingG(3.5, 0.5);
-    drawBuildingG(0.5, 4.5);
-    drawBuildingG(2.5, -0.5);
-    drawBuildingG(-0.5, 4.5);
-    drawBuildingG(4.5, 3.5);
-    drawBuildingG(0.5, 2.5); // Edificio en la esquina
-
-    function drawBuildingP(x, y){
-        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
-        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
-
-        let baseX = x * tileSize + offset;
-        let baseY = y * tileSize + offset;
-
-        ctx.fillStyle = '#572364'; // Rosa
-        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
-
-        // Dibujar el borde negro
-        ctx.strokeStyle = '#000000'; // Negro
-        ctx.lineWidth = 2; // Grosor del borde
-        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
-    }
-    drawBuildingP(3.5, 4.5); // Edificio en el centro
-    drawBuildingP(1.5, 3.5);
-    drawBuildingP(-0.5, 2.5);
-    drawBuildingP(1.5, 2.5);
-    drawBuildingP(4.5, -0.5);
-    drawBuildingP(4.5, 1.5);
-    drawBuildingP(2.5, 0.5); // Edificio en la esquina
-
-    function drawBuildingPi(x, y){
-        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
-        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
-
-        let baseX = x * tileSize + offset;
-        let baseY = y * tileSize + offset;
-
-        ctx.fillStyle = '#FFCBDB'; // Rosa
-        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
-
-        // Dibujar el borde negro
-        ctx.strokeStyle = '#000000'; // Negro
-        ctx.lineWidth = 2; // Grosor del borde
-        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
-    }
-    drawBuildingPi(4.5, 4.5); // Edificio en el centro
-    drawBuildingPi(1.5, 1.5);
-    drawBuildingPi(3.5, 1.5);
-    drawBuildingPi(1.5, -0.5);
-    drawBuildingPi(2.5, 3.5);
-    drawBuildingPi(4.5, 0.5); // Edificio en la esquina
-    drawBuildingPi(-0.5, 3.5); // Edificio en la esquina
-  
+    drawHollowObstacle(1,3);
 }
 
-// Llamar a createMap cuando la página se cargue
+// Cargar mapa al inicio
 window.addEventListener('load', createMap);
