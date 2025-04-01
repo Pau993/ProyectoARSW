@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class Bus implements Runnable {
     private String playerId;
+    private String plate;
     private int x;
     private int y;
     private final int speed = 10;
@@ -20,8 +21,9 @@ public class Bus implements Runnable {
     private final Condition moveCondition = lock.newCondition();
     private boolean canMove = false; // Indica si el bus puede moverse
 
-    public Bus(String playerId, int startX, int startY, SimpMessagingTemplate messagingTemplate) {
+    public Bus(String playerId, String plate, int startX, int startY, SimpMessagingTemplate messagingTemplate) {
         this.playerId = playerId;
+        this.plate = plate;
         this.x = startX;
         this.y = startY;
         this.messagingTemplate = messagingTemplate;
@@ -31,6 +33,11 @@ public class Bus implements Runnable {
     public String getPlayerId() {
         return playerId;
     }
+
+    public String getPlate() {
+        return plate;
+    }
+
 
     public int getX() {
         return x;

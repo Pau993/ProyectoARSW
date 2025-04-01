@@ -1,6 +1,6 @@
 function drawBuses() {
     if (!window.ctx || !window.canvas) {
-        console.error("❌ Error: El canvas o el contexto no están inicializados.");
+        console.error("Error: El canvas o el contexto no están inicializados.");
         return;
     }
 
@@ -9,10 +9,10 @@ function drawBuses() {
 
     createMap();
 
-    console.log("🚌 Dibujando buses, total:", Object.keys(buses).length);
-    console.log(buses); // ✅ Muestra los buses en consola
+    console.log("Dibujando buses, total:", Object.keys(buses).length);
+    console.log(buses); // Muestra los buses en consola
 
-    Object.values(buses).forEach(bus => {
+    Object.entries(buses).forEach(([id, bus]) => {
         // Guardar la posición original para rotar el bus correctamente
         window.ctx.save();
 
@@ -26,14 +26,14 @@ function drawBuses() {
         window.ctx.fillStyle = "yellow";
         window.ctx.fillRect(-bus.width / 2, -bus.height / 2, bus.width, bus.height); // Dibujar el bus centrado
 
-        // 🖼 Ventanas del bus
+        // Ventanas del bus
         window.ctx.fillStyle = "blue";
         const windowPositions = [5, 20, 35];
         windowPositions.forEach(offset => {
             window.ctx.fillRect(-bus.width / 2 + offset, -bus.height / 2 + 5, 10, 10);
         });
 
-        // ⚫ Ruedas del bus
+        // Ruedas del bus
         window.ctx.fillStyle = "black";
         [10, 40].forEach(offset => {
             window.ctx.beginPath();
@@ -41,7 +41,13 @@ function drawBuses() {
             window.ctx.fill();
         });
 
-        // Restaurar el contexto
+        // Restaurar el contexto para dibujar la placa
         window.ctx.restore();
+
+        // Dibujar la placa encima del bus
+        window.ctx.fillStyle = "black";
+        window.ctx.font = "14px Arial";
+        window.ctx.textAlign = "center";
+        window.ctx.fillText(id, bus.x + bus.width / 2, bus.y - 5);
     });
 }

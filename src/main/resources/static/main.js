@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
         connectBtn.addEventListener("click", connectWebSocket);
     }
 
-    // 🔹 Asegurar que los botones existen antes de asignar eventos
     const registerBtn = document.querySelector(".btn-container button:nth-child(2)");
     if (registerBtn) {
         registerBtn.addEventListener("click", showRegisterPlate);
@@ -16,6 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const backBtn = document.querySelector(".btn-back");
     if (backBtn) {
         backBtn.addEventListener("click", goBack);
+    }
+
+    const registerUserBtn = document.getElementById("register-button");
+    if (registerUserBtn) {
+        registerUserBtn.addEventListener("click", registerUser);
+    }
+
+    const startGameBtn = document.getElementById("start-game-button");
+    if (startGameBtn) {
+        startGameBtn.addEventListener("click", startGame);
     }
 });
 
@@ -30,20 +39,19 @@ function connectWebSocket() {
         webSocketFactory: () => socket,
         debug: (str) => console.log(str),
         onConnect: () => {
-            console.log("✅ Conectado al servidor WebSocket");
+            console.log("Conectado al servidor WebSocket");
             alert("Conectado al WebSocket correctamente.");
             
             // Guardar estado de conexión
             sessionStorage.setItem("wsConnected", "true");
         },
         onStompError: (frame) => {
-            console.error("❌ Error en WebSocket:", frame);
+            console.error(" Error en WebSocket:", frame);
         }
     });
 
     window.client.activate();
 }
-
 
 function showRegisterPlate() {
     document.getElementById('main-view').style.display = 'none';
@@ -81,7 +89,7 @@ function registerUser() {
     }
 
     if (!window.client || !window.client.connected) {
-        alert("❌ No puedes jugar sin estar conectado al WebSocket.");
+        alert("No puedes jugar sin estar conectado al WebSocket.");
         return;
     }
 
@@ -92,6 +100,24 @@ function registerUser() {
     localStorage.setItem("username", user);
     localStorage.setItem("playerId", plate);
 
-    // Redirigir al juego
-    window.location.href = "game.html";
+    // Enviar la placa y el usuario al servidor
+    const message = `${user}:${plate}`;
+    window.client.publish({ destination: "/app/join", body: message });
+
+    // Mostrar botón de iniciar juego
+    document.getElementById("register-button").style.display = "none";
+    document.getElementById("start-game-button").style.display = "block";
+
+
+}
+
+function startGame() {
+    const plate = localStorage.getItem("playerId");
+    if (!plate) {
+        alert("No se encontró una placa registrada. Por favor, regístrate primero.");
+        return;
+    }
+
+    // Redirigir al juego con la placa asignada
+    window.location.href = `game.html?plate=${encodeURIComponent(plate)}`;
 }

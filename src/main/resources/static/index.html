@@ -18,6 +18,9 @@
             <button class="btn" onclick="openSettings()">Configuraciones</button>
             <button class="btn" onclick="redirectToRules()">Reglas de juego</button>
         </div>
+
+        <div id="connection-status" style="margin-top: 10px; font-weight: bold;"></div>
+        
     </div>
 
     <!-- Vista de registro de placa -->
@@ -27,7 +30,8 @@
         <div class="form-container">
             <input type="text" id="user" placeholder="Nombre de Usuario">
             <input type="text" id="plate" placeholder="Placa Asignada" readonly>
-            <button onclick="registerUser()">REGISTRAR USUARIO</button>
+            <button id="register-button">REGISTRAR USUARIO</button>
+            <button id="start-game-button" style="display: none;">Iniciar Juego</button>
             <a href="#" class="btn-back" onclick="goBack()">VOLVER</a>
         </div>
     </div>

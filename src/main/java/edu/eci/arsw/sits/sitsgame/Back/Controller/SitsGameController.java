@@ -42,16 +42,16 @@ public class SitsGameController {
             String direction;
 
             if (startOnLeft) {
-                randomX = 0;  // 🚍 Aparece en la izquierda (sobre la carretera)
+                randomX = 0;  // Aparece en la izquierda (sobre la carretera)
                 randomY = (random.nextInt(5) * TILE_SIZE) + randomLane;
                 direction = "RIGHT";  // Se mueve hacia la derecha
             } else {
-                randomX = MAP_WIDTH - BUS_SIZE;  // 🚍 Aparece en la derecha
+                randomX = MAP_WIDTH - BUS_SIZE;  // Aparece en la derecha
                 randomY = (random.nextInt(5) * TILE_SIZE) + randomLane;
                 direction = "LEFT";  // Se mueve hacia la izquierda
             }
 
-            Bus newBus = new Bus(playerId, randomX, randomY, messagingTemplate);
+            Bus newBus = new Bus(playerId, direction, randomX, randomY, messagingTemplate);
             newBus.setDirection(direction); // Asignar dirección inicial
             Thread busThread = new Thread(newBus);
 
