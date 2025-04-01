@@ -10,8 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
     window.canvas = canvas; // Hacer `canvas` accesible globalmente
     window.ctx = canvas.getContext("2d"); // Hacer `ctx` accesible globalmente
 
-    console.log ("Canvas incializado")
-    
+    console.log("Canvas incializado");
+
+    createMap(); 
+
     // Verificar si la conexión WebSocket está guardada en sessionStorage
     if (sessionStorage.getItem("wsConnected") !== "true") {
         console.error("❌ No hay conexión WebSocket guardada.");
@@ -66,18 +68,19 @@ function suscribirEventos() {
 
             if (data[0] === "NEW_BUS") {
                 const [id, x, y] = data[1].split(",");
-                buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30 };
+                buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: 0 };
             } else if (data[0] === "ALL_BUSES") {
-                buses = {}; // Reiniciar lista de buses
+                buses = {}; // Reiniciar solo la lista global de buses
                 for (let i = 1; i < data.length; i++) {
-                    const [id, x, y] = data[i].split(",");
-                    buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30 };
+                    const [id, x, y, angle] = data[i].split(",");
+                    buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: parseFloat(angle) };
                 }
             } else if (data[0] === "BUS") {
-                const [id, x, y] = data[1].split(",");
+                const [id, x, y, angle] = data[1].split(",");
                 if (buses[id]) {
                     buses[id].x = parseInt(x);
                     buses[id].y = parseInt(y);
+                    buses[id].angle = parseFloat(angle); // Actualizar la orientación
                 }
             }
         });
@@ -104,3 +107,4 @@ function suscribirEventos() {
         }
     });
 }
+

@@ -30,14 +30,14 @@ function connectWebSocket() {
         webSocketFactory: () => socket,
         debug: (str) => console.log(str),
         onConnect: () => {
-            console.log("Conectado al servidor WebSocket");
+            console.log("✅ Conectado al servidor WebSocket");
             alert("Conectado al WebSocket correctamente.");
             
             // Guardar estado de conexión
             sessionStorage.setItem("wsConnected", "true");
         },
         onStompError: (frame) => {
-            console.error("Error en WebSocket:", frame);
+            console.error("❌ Error en WebSocket:", frame);
         }
     });
 
@@ -81,7 +81,7 @@ function registerUser() {
     }
 
     if (!window.client || !window.client.connected) {
-        alert("No puedes jugar sin estar conectado al WebSocket.");
+        alert("❌ No puedes jugar sin estar conectado al WebSocket.");
         return;
     }
 
@@ -92,11 +92,6 @@ function registerUser() {
     localStorage.setItem("username", user);
     localStorage.setItem("playerId", plate);
 
-    const startGameBtn = document.getElementById('startGameBtn');
-    startGameBtn.style.display = 'block';
-}
-
-function startGame() {
-    // Redirigir al usuario al juego
+    // Redirigir al juego
     window.location.href = "game.html";
 }
