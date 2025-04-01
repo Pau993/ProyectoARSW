@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     createMap();
 
+
     // Verificar si la conexión WebSocket está guardada en sessionStorage
     if (sessionStorage.getItem("wsConnected") !== "true") {
         console.error("No hay conexión WebSocket guardada.");
@@ -90,11 +91,18 @@ function suscribirEventos() {
                     buses[id].angle = parseFloat(angle); // Actualizar la orientación
                     buses[id].plate = plate; // Actualizar la placa
                 }
+            }else if (data[0] === "COLLISION") {
+                const [bus1, bus2] = data[1].split(",");
+                delete buses[bus1];
+                delete buses[bus2];
+                console.log(`Buses colisionados: ${bus1}, ${bus2}`);
             }
         });
 
         drawBuses(); // Dibujar solo los buses con placas
+        updateBuses(); // Actualizar la posición de los buses
     });
+
 
     // Enviar solicitud para unirse al juego
     console.log("Enviando solicitud de conexión para", playerId);
@@ -114,4 +122,6 @@ function suscribirEventos() {
             window.client.publish({ destination: "/app/move", body: playerId + ":" + direction });
         }
     });
+
+    
 }
