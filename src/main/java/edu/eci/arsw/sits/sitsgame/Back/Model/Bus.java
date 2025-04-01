@@ -1,5 +1,9 @@
 package edu.eci.arsw.sits.sitsgame.Back.Model;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class Bus implements Runnable {
@@ -11,6 +15,10 @@ public class Bus implements Runnable {
     private boolean running = true;
     private final SimpMessagingTemplate messagingTemplate;
     private double angle = 0; // Ángulo de orientación del bus
+
+    private final Lock lock = new ReentrantLock();
+    private final Condition moveCondition = lock.newCondition();
+    private boolean canMove = false; // Indica si el bus puede moverse
 
     public Bus(String playerId, int startX, int startY, SimpMessagingTemplate messagingTemplate) {
         this.playerId = playerId;
@@ -72,16 +80,43 @@ public class Bus implements Runnable {
         running = false;
     }
 
+    public void allowMove() {
+        lock.lock();
+        try {
+            System.out.println("allowMove() llamado para el bus con playerId: " + playerId);
+            canMove = true;
+            moveCondition.signal(); // Despertar al hilo para que se mueva
+        } finally {
+            lock.unlock();
+        }
+    }
+
     @Override
     public void run() {
         while (running) {
-            move(); // Mueve el bus automáticamente
+            lock.lock();
+            try {
+                while (!canMove) {
+                    System.out.println("Esperando permiso para moverse...");
+                    moveCondition.await(); // Esperar hasta que se permita el movimiento
+                }
+                System.out.println("Permiso recibido. Moviendo el bus.");
+                canMove = false; // Resetear el estado para esperar el próximo botón
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            } finally {
+                lock.unlock();
+            }
 
-            // 🔄 Enviar la posición y la orientación a todas las pestañas
+            move(); // Mueve el bus automáticamente
+            System.out.println("Bus movido a posición: " + x + ", " + y);
+
+            // Enviar la posición y la orientación a todas las pestañas
             messagingTemplate.convertAndSend("/topic/game", "BUS:" + playerId + "," + x + "," + y + "," + angle);
 
             try {
-                Thread.sleep(100); // 🚀 Movimiento cada 100ms
+                Thread.sleep(100); // Movimiento cada 100ms
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

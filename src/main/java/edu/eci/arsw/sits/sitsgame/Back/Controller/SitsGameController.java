@@ -32,7 +32,7 @@ public class SitsGameController {
     @SendTo("/topic/game")
     public String handleNewPlayer(String playerId) {
         if (!buses.containsKey(playerId)) {
-            // 🔥 Alternar entre dos posiciones iniciales dentro de la carretera
+            // Alternar entre dos posiciones iniciales dentro de la carretera
             boolean startOnLeft = buses.size() % 2 == 0;
             int laneOffset = (TILE_SIZE - ROAD_WIDTH) / 2;
             int randomLane = random.nextBoolean() ? laneOffset : laneOffset + BUS_SIZE;
@@ -85,9 +85,11 @@ public class SitsGameController {
         if (buses.containsKey(playerId)) {
             Bus bus = buses.get(playerId);
 
-            // 📌 Validar movimiento en la carretera
+            // Validar movimiento en la carretera
             if (isValidMove(bus, direction)) {
                 bus.setDirection(direction); // Cambia la dirección del bus
+                bus.allowMove(); // Permitir que el bus se mueva
+                bus.move(); // Mover el bus inmediatamente
             }
         }
     }
