@@ -91,6 +91,148 @@ function createMap() {
             road.vertical
         );
     });
+
+    // Dibujar obstaculos (ejemplo: edificios cafes)
+    function drawBuilding(x, y) {
+        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
+        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+    
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        // Dibujar el cuerpo del edificio
+        ctx.fillStyle = '#8B4513'; // Marrón
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        // Dibujar el borde negro
+        ctx.strokeStyle = '#000000'; // Negro
+        ctx.lineWidth = 2; // Grosor del borde
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+    
+    drawBuilding(1.5, 1.5); // Edificio en el centro
+    drawBuilding(3.5, 3.5);
+    drawBuilding(2.5, 4.5);
+    drawBuilding(-0.5, 0.5);
+    drawBuilding(4.5, 2.5);
+    drawBuilding(0.5, 3.5); // Edificio en la esquina
+
+    function drawBuildingB(x, y){
+        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
+        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        ctx.fillStyle = '#3B83BD'; // Marrón
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        // Dibujar el borde negro
+        ctx.strokeStyle = '#000000'; // Negro
+        ctx.lineWidth = 2; // Grosor del borde
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+
+    drawBuildingB(2.5, 2.5); // Edificio en el centro
+    drawBuildingB(3.5, 2.5);
+    drawBuildingB(-0.5, -0.5);
+    drawBuildingB(2.5, 3.5);
+    drawBuildingB(-0.5, 2.5);
+    drawBuildingB(4.5, 4.5);
+    drawBuildingB(0.5, 1.5); // Edificio en la esquina
+
+    function drawBuildingR(x, y){
+        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
+        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        ctx.fillStyle = '#FF0000'; // Rojo
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        // Dibujar el borde negro
+        ctx.strokeStyle = '#000000'; // Negro
+        ctx.lineWidth = 2; // Grosor del borde
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+    drawBuildingR(0.5, 0.5); // Edificio en el centro
+    drawBuildingR(1.5, 0.5);
+    drawBuildingR(3.5, -0.5);
+    drawBuildingR(2.5, 2.5);
+    drawBuildingR(-0.5, 1.5);
+    drawBuildingR(4.5, 1.5);
+    drawBuildingR(2.5, 1.5); // Edificio en la esquina
+
+    function drawBuildingG(x, y){
+        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
+        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        ctx.fillStyle = '#008F39'; // Verde
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        // Dibujar el borde negro
+        ctx.strokeStyle = '#000000'; // Negro
+        ctx.lineWidth = 2; // Grosor del borde
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+    drawBuildingG(1.5, 4.5); // Edificio en el centro
+    drawBuildingG(3.5, 0.5);
+    drawBuildingG(0.5, 4.5);
+    drawBuildingG(2.5, -0.5);
+    drawBuildingG(-0.5, 4.5);
+    drawBuildingG(4.5, 3.5);
+    drawBuildingG(0.5, 2.5); // Edificio en la esquina
+
+    function drawBuildingP(x, y){
+        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
+        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        ctx.fillStyle = '#572364'; // Rosa
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        // Dibujar el borde negro
+        ctx.strokeStyle = '#000000'; // Negro
+        ctx.lineWidth = 2; // Grosor del borde
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+    drawBuildingP(3.5, 4.5); // Edificio en el centro
+    drawBuildingP(1.5, 3.5);
+    drawBuildingP(-0.5, 2.5);
+    drawBuildingP(1.5, 2.5);
+    drawBuildingP(4.5, -0.5);
+    drawBuildingP(4.5, 1.5);
+    drawBuildingP(2.5, 0.5); // Edificio en la esquina
+
+    function drawBuildingPi(x, y){
+        let buildingSize = tileSize * 0.2; // Hace el edificio un 60% del tamaño de la celda
+        let offset = (tileSize - buildingSize) / 2; // Centrarlo en la celda
+
+        let baseX = x * tileSize + offset;
+        let baseY = y * tileSize + offset;
+
+        ctx.fillStyle = '#FFCBDB'; // Rosa
+        ctx.fillRect(baseX, baseY, buildingSize, buildingSize);
+
+        // Dibujar el borde negro
+        ctx.strokeStyle = '#000000'; // Negro
+        ctx.lineWidth = 2; // Grosor del borde
+        ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
+    }
+    drawBuildingPi(4.5, 4.5); // Edificio en el centro
+    drawBuildingPi(1.5, 1.5);
+    drawBuildingPi(3.5, 1.5);
+    drawBuildingPi(1.5, -0.5);
+    drawBuildingPi(2.5, 3.5);
+    drawBuildingPi(4.5, 0.5); // Edificio en la esquina
+    drawBuildingPi(-0.5, 3.5); // Edificio en la esquina
+  
 }
 
 // Llamar a createMap cuando la página se cargue
