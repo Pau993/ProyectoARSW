@@ -228,12 +228,18 @@ function createMap() {
         ctx.beginPath();
         ctx.arc(x, y, personRadius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = 'black'; // Contorno negro
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
         // Cabeza
         ctx.fillStyle = skinColor || getRandomSkinColor(); // Color de piel
         ctx.beginPath();
         ctx.arc(x, y - personRadius * 1.5, personRadius * 0.5, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = 'black'; // Contorno negro
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
 
     // Función para obtener un color aleatorio para la persona
