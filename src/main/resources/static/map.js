@@ -197,29 +197,38 @@ function createMap() {
 
     // Función para generar los letreros de construcción de forma aleatoria
     function generateConstructionSigns(numSigns) {
-        if (constructionSigns.length === 0) {  // Solo generar señales si no hay ninguna
-            for (let i = 0; i < numSigns; i++) {
+        if (constructionSigns.length === 0) {
+            let attempts = 0;
+            while (constructionSigns.length < numSigns && attempts < 100) {  // Evita bucles infinitos
                 const tileX = Math.floor(Math.random() * mapSize);
                 const tileY = Math.floor(Math.random() * mapSize);
     
-                // Posición dentro de la carretera
                 const offsetX = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
                 const offsetY = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
     
                 const signX = tileX * tileSize + offsetX;
                 const signY = tileY * tileSize + offsetY;
     
-                constructionSigns.push({ x: signX, y: signY });  // Guardar la señal
+                if (!isPositionOccupied(signX, signY)) {  // Solo agrega si está libre
+                    constructionSigns.push({ x: signX, y: signY });
+                }
+    
+                attempts++;  // Controla intentos para evitar bucles infinitos
             }
         }
     }
     
-
-
     // Dibujar los obstáculos en el mapa
     function drawObstacles() {
         obstacles.forEach(obstacle => drawObstacle(obstacle.x, obstacle.y));
     }
+
+    function isPositionOccupied(x, y) {
+        return obstacles.some(obstacle => {
+            return Math.abs(obstacle.x - x) < roadWidth && Math.abs(obstacle.y - y) < roadWidth;
+        });
+    }
+    
     // Dibujar todas las señales generadas
     constructionSigns.forEach(sign => drawConstructionSign(sign.x, sign.y));
 
