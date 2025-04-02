@@ -1,5 +1,7 @@
 let obstacles = []; // Variable global para almacenar los obstáculos
 let constructionSigns = [];
+let people = []; // Variable global para almacenar las personas
+let peopleGenerated = false; // Variable para controlar la generación única
 
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
@@ -156,7 +158,6 @@ function createMap() {
         }
     }
 
-
     // Función para dibujar letreros de construcción en forma de triángulo
     function drawConstructionSign(x, y) {
         const base = 30;  // Base del triángulo
@@ -217,6 +218,70 @@ function createMap() {
             }
         }
     }
+
+    // Función para dibujar una persona
+    function drawPerson(x, y, bodyColor, skinColor) {
+        const personRadius = 10; // Radio de la persona
+        
+        // Cuerpo
+        ctx.fillStyle = bodyColor || getRandomPersonColor(); // Color de cuerpo
+        ctx.beginPath();
+        ctx.arc(x, y, personRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cabeza
+        ctx.fillStyle = skinColor || getRandomSkinColor(); // Color de piel
+        ctx.beginPath();
+        ctx.arc(x, y - personRadius * 1.5, personRadius * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Función para obtener un color aleatorio para la persona
+    function getRandomPersonColor() {
+        const colors = ['#FF6347', '#4682B4', '#2E8B57', '#8A2BE2', '#FF4500', '#1E90FF'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    // Función para obtener un color de piel aleatorio
+    function getRandomSkinColor() {
+        const skinColors = ['#FFA07A', '#DEB887', '#D2B48C', '#F4A460', '#CD853F'];
+        return skinColors[Math.floor(Math.random() * skinColors.length)];
+    }
+
+    // Función para generar personas en la carretera
+    function generatePeople(numPeople) {
+        // Solo genera personas si aún no se han generado
+        if (!peopleGenerated) {
+            people = []; // Limpiar personas existentes
+            for (let i = 0; i < numPeople; i++) {
+                const tileX = Math.floor(Math.random() * mapSize);
+                const tileY = Math.floor(Math.random() * mapSize);
+
+                // Posición aleatoria dentro de la carretera del tile
+                const offsetX = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
+                const offsetY = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
+
+                const personX = tileX * tileSize + offsetX;
+                const personY = tileY * tileSize + offsetY;
+
+                // Verificar que no esté ocupada la posición
+                if (!isPositionOccupied(personX, personY)) {
+                    people.push({ 
+                        x: personX, 
+                        y: personY,
+                        bodyColor: getRandomPersonColor(),
+                        skinColor: getRandomSkinColor()
+                    });
+                }
+            }
+            peopleGenerated = true;
+        }
+    }
+
+    // Dibujar las personas en el mapa
+    function drawPeople() {
+        people.forEach(person => drawPerson(person.x, person.y, person.bodyColor, person.skinColor));
+    }
     
     // Dibujar los obstáculos en el mapa
     function drawObstacles() {
@@ -232,12 +297,12 @@ function createMap() {
     // Dibujar todas las señales generadas
     constructionSigns.forEach(sign => drawConstructionSign(sign.x, sign.y));
 
-
     // Inicialización y dibujado
     generateObstacles(10);
     drawObstacles();
     generateConstructionSigns(5);
-
+    generatePeople(8); // Genera 8 personas
+    drawPeople(); // Dibuja las personas
 }
 
 // Cargar mapa al inicio
