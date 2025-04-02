@@ -1,13 +1,11 @@
 let obstacles = []; // Variable global para almacenar los obstáculos
+let constructionSigns = [];
 
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const tileSize = 200; // Tamaño de cada tile
     const mapSize = 5; // Tamaño del mapa (5x5)
-
-    const gridWidth = mapSize;
-    const gridHeight = mapSize;
 
     const busWidth = 50; // Ancho de un autobús
     const roadWidth = busWidth * 2; // Ancho total de la carretera para dos autobuses
@@ -158,15 +156,80 @@ function createMap() {
         }
     }
 
+
+    // Función para dibujar letreros de construcción en forma de triángulo
+    function drawConstructionSign(x, y) {
+        const base = 30;  // Base del triángulo
+        const height = 40; // Altura del triángulo
+
+        // Coordenadas del triángulo (punta arriba)
+        const x1 = x;
+        const y1 = y - height / 2;
+        const x2 = x - base / 2;
+        const y2 = y + height / 2;
+        const x3 = x + base / 2;
+        const y3 = y + height / 2;
+
+        // Fondo amarillo
+        ctx.fillStyle = '#FFFF00';
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.closePath();
+        ctx.fill();
+
+        // Triángulo negro
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Texto de "Construcción"
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px Arial';
+        ctx.fillText('Construcción', x - 15, y - height / 2 - 5);
+    }
+
+    // Función para generar los letreros de construcción de forma aleatoria
+    function generateConstructionSigns(numSigns) {
+        if (constructionSigns.length === 0) {  // Solo generar señales si no hay ninguna
+            for (let i = 0; i < numSigns; i++) {
+                const tileX = Math.floor(Math.random() * mapSize);
+                const tileY = Math.floor(Math.random() * mapSize);
+    
+                // Posición dentro de la carretera
+                const offsetX = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
+                const offsetY = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
+    
+                const signX = tileX * tileSize + offsetX;
+                const signY = tileY * tileSize + offsetY;
+    
+                constructionSigns.push({ x: signX, y: signY });  // Guardar la señal
+            }
+        }
+    }
+    
+
+
     // Dibujar los obstáculos en el mapa
     function drawObstacles() {
         obstacles.forEach(obstacle => drawObstacle(obstacle.x, obstacle.y));
     }
+    // Dibujar todas las señales generadas
+    constructionSigns.forEach(sign => drawConstructionSign(sign.x, sign.y));
 
-    // Llamar a la generación y dibujo de obstáculos solo una vez
-    generateObstacles(10); // Cambia el número de obstáculos según sea necesario
+
+    // Inicialización y dibujado
+    generateObstacles(10);
     drawObstacles();
+    generateConstructionSigns(5);
+
 }
 
 // Cargar mapa al inicio
-window.addEventListener('load', createMap);
+window.addEventListener('DOMContentLoaded', createMap);
