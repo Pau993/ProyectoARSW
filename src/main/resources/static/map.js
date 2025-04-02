@@ -1,3 +1,5 @@
+let obstacles = []; // Variable global para almacenar los obstáculos
+
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -13,7 +15,6 @@ function createMap() {
 
     ctx.fillStyle = '#90EE90'; // Verde claro (césped)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 
     // Dibujar carretera
     function drawRoad(x, y, horizontal, vertical) {
@@ -127,44 +128,44 @@ function createMap() {
         { x: 3.5, y: -0.5, color: '#C9D9F7' }, // Pastel Azul Claro
         { x: 4.5, y: -0.5, color: '#FFD9E1' }  // Pastel Rosa Suave
     ];
-    
-    
-    
     buildings.forEach(building => drawBuilding(building.x, building.y, building.color));
 
-    // Dibujar obstáculos circulares huecos (negros)
-    function drawHollowObstacle(x, y) {
-        let obstacleSize = tileSize * 0.2;
-        let centerX = x * tileSize + tileSize / 2;
-        let centerY = y * tileSize + tileSize / 2;
-
-        ctx.fillStyle = '#000000'; // Negro total
+    // Función para dibujar un obstáculo circular
+    function drawObstacle(x, y) {
+        const obstacleRadius = 15; // Radio del obstáculo
+        ctx.fillStyle = '#3A2B17'; // Negro
         ctx.beginPath();
-        ctx.arc(centerX, centerY, obstacleSize / 2, 0, Math.PI * 2);
+        ctx.arc(x, y, obstacleRadius, 0, Math.PI * 2);
         ctx.fill();
     }
 
-    // Generar huecos aleatorios en la carretera
-    function generateRandomHoles(count) {
-        let placedPositions = new Set();
+    // Función para generar los obstáculos
+    function generateObstacles(numObstacles) {
+        if (obstacles.length === 0) { // Solo generar si no hay obstáculos
+            for (let i = 0; i < numObstacles; i++) {
+                const tileX = Math.floor(Math.random() * mapSize);
+                const tileY = Math.floor(Math.random() * mapSize);
 
-        for (let i = 0; i < count; i++) {
-            let randomX, randomY, key;
-            do {
-                randomX = Math.floor(Math.random() * gridWidth);
-                randomY = Math.floor(Math.random() * gridHeight);
-                key = `${randomX},${randomY}`;
-            } while (
-                placedPositions.has(key) || 
-                buildings.some(b => b.x === randomX && b.y === randomY) // Evita edificios
-            );
+                // Posición aleatoria dentro de la carretera del tile
+                const offsetX = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
+                const offsetY = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
 
-            placedPositions.add(key);
-            drawHollowObstacle(randomX, randomY);
+                const obstacleX = tileX * tileSize + offsetX;
+                const obstacleY = tileY * tileSize + offsetY;
+
+                obstacles.push({ x: obstacleX, y: obstacleY });
+            }
         }
     }
 
-    drawHollowObstacle(1,3);
+    // Dibujar los obstáculos en el mapa
+    function drawObstacles() {
+        obstacles.forEach(obstacle => drawObstacle(obstacle.x, obstacle.y));
+    }
+
+    // Llamar a la generación y dibujo de obstáculos solo una vez
+    generateObstacles(10); // Cambia el número de obstáculos según sea necesario
+    drawObstacles();
 }
 
 // Cargar mapa al inicio
