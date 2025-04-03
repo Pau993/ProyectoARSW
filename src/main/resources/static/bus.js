@@ -70,11 +70,8 @@ function updateBuses() {
         for (let j = i + 1; j < busArray.length; j++) {
             handleCollision(busArray[i], busArray[j]);
         }
-        // Verificar colisiones con personas para cada bus
-        checkCollisionWithPeople(busArray[i].x, busArray[i].y, busArray[i].id);
     }
 }
-
 
 function drawBuses() {
     if (!window.ctx || !window.canvas) {

@@ -1,6 +1,7 @@
 package edu.eci.arsw.sits.sitsgame.Back.Model;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -83,53 +84,99 @@ public class Bus implements Runnable {
         return angle;
     }
 
-    public void move(List<Bus> allBuses) {
-        int newX = x, newY = y;
+public void move(List<Bus> allBuses) {
+    int newX = x, newY = y;
 
-        switch (direction) {
-            case "UP":
-                newY -= speed;
-                break;
-            case "DOWN":
-                newY += speed;
-                break;
-            case "LEFT":
-                newX -= speed;
-                break;
-            case "RIGHT":
-                newX += speed;
-                break;
-        }
+    switch (direction) {
+        case "UP":
+            newY -= speed;
+            break;
+        case "DOWN":
+            newY += speed;
+            break;
+        case "LEFT":
+            newX -= speed;
+            break;
+        case "RIGHT":
+            newX += speed;
+            break;
+    }
 
-        // Verificar si la nueva posición genera una colisión con otro bus
-        for (Bus other : allBuses) {
-            if (!other.equals(this) && this.collidesWith(other)) {
+    // Verificar colisión
+    for (Bus other : allBuses) {
+        if (other != null && other.running && !this.plate.equals(other.plate)) {
+            if (this.collidesWith(other)) {
                 System.out.println("¡Colisión detectada entre " + this.plate + " y " + other.plate + "!");
-                running = false; // Detener el bus que choca
-                return;
+
+                // **Evitar doble eliminación asegurando que solo un bus maneje la colisión**
+                if (this.plate.compareTo(other.plate) > 0) {
+                    System.out.println("Bus " + this.plate + " decide el resultado de la colisión.");
+
+                    // Determinar aleatoriamente quién sobrevive
+                    Bus busToRemove = new Random().nextBoolean() ? this : other;
+                    Bus survivor = (busToRemove == this) ? other : this;
+
+                    // Eliminar el bus perdedor
+                    busToRemove.stop();
+                    GameManager.removeBus(busToRemove.plate);
+                    messagingTemplate.convertAndSend("/topic/collision", "COLLISION:" + busToRemove.plate);
+
+                    System.out.println("Bus eliminado: " + busToRemove.plate);
+
+                    // Asegurar que el bus sobreviviente puede seguir moviéndose
+                    survivor.lock.lock();
+                    try {
+                        survivor.running = true;
+                        survivor.canMove = true;
+                        survivor.moveCondition.signal();
+                    } finally {
+                        survivor.lock.unlock();
+                    }
+
+                    return; // Salir de la función, evitando cualquier otro cambio
+                } else {
+                    return; // No hacer nada si el otro bus ya maneja la colisión
+                }
             }
         }
-
-        // Si no hay colisión, actualizar la posición
-        this.x = newX;
-        this.y = newY;
     }
+
+    // Si no hay colisión, actualizar la posición
+    this.x = newX;
+    this.y = newY;
+}
 
     public boolean collidesWith(Bus other) {
-        int busWidth = 50; // Ajusta según el tamaño real de los buses
+        // Verificar que el otro bus no sea null y esté activo
+        if (other == null || !other.running) {
+            return false;
+        }
+
+        // Verificar que no sea el mismo bus
+        if (this.plate.equals(other.plate)) {
+            return false;
+        }
+
+        int busWidth = 50;
         int busHeight = 100;
 
-        return this.x < other.x + busWidth &&
-                this.x + busWidth > other.x &&
-                this.y < other.y + busHeight &&
-                this.y + busHeight > other.y;
-    }
+        // Calcular las coordenadas de los bordes de ambos buses
+        int thisRight = this.x + busWidth;
+        int thisBottom = this.y + busHeight;
+        int otherRight = other.x + busWidth;
+        int otherBottom = other.y + busHeight;
 
-    @SuppressWarnings("unused")
-    private void handleCollision(Bus other) {
-        System.out.println("Bus " + this.plate + " colisionó con " + other.plate);
-        this.running = false; // El bus muere
-        messagingTemplate.convertAndSend("/topic/collision", "COLLISION:" + this.plate + "," + other.plate);
+        // Verificar si hay intersección entre los rectángulos
+        boolean collision = this.x < otherRight &&
+                thisRight > other.x &&
+                this.y < otherBottom &&
+                thisBottom > other.y;
+
+        if (collision) {
+            System.out.println("Colisión real detectada entre bus " + this.plate + " y bus " + other.plate);
+        }
+
+        return collision;
     }
 
     public String getPosition() {
@@ -137,7 +184,13 @@ public class Bus implements Runnable {
     }
 
     public void stop() {
-        running = false;
+        lock.lock();
+        try {
+            running = false;
+            canMove = false;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void allowMove() {
