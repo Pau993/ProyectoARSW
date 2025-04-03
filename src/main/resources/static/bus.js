@@ -61,17 +61,17 @@ function handleCollision(bus1, bus2) {
     }
 }
 
-// Función que actualiza los buses y revisa colisiones
+// En la función updateBuses
 function updateBuses() {
-    const busArray = Object.values(buses);  // Obtener todos los buses
+    const busArray = Object.values(buses);
 
     // Revisar las colisiones entre todos los buses
     for (let i = 0; i < busArray.length; i++) {
         for (let j = i + 1; j < busArray.length; j++) {
-            handleCollision(busArray[i], busArray[j]);  // Verificar colisión entre dos buses
+            handleCollision(busArray[i], busArray[j]);
         }
-
-        checkCollisionWithPeople(busArray[i].x, busArray[i].y);
+        // Verificar colisiones con personas para cada bus
+        checkCollisionWithPeople(busArray[i].x, busArray[i].y, busArray[i].id);
     }
 }
 

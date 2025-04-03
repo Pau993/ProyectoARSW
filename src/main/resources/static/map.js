@@ -4,6 +4,7 @@ let people = []; // Variable global para almacenar las personas
 let peopleGenerated = false; // Variable para controlar la generación única
 let score = 0; // Variable para almacenar el puntaje
 let gameOver = false; // Variable para controlar el estado del juego
+let globalScores = {};
 
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
@@ -287,22 +288,29 @@ function createMap() {
     }
 
     //Verificar si el bus pasa sobre una persona
-    function checkCollisionWithPeople(busX, busY) {
-        const collisionBuffer = 5; // Small buffer for more accurate collision
-        people = people.filter(person => {
-            const collision = !(
-                person.x + collisionBuffer > busX + busWidth ||
-                person.x - collisionBuffer < busX ||
-                person.y + collisionBuffer > busY + busHeight ||
-                person.y - collisionBuffer < busY
-            );
-            if (collision) {
-                score++;
-                updateScore(); // Use the correct function name
+function checkCollisionWithPeople(busX, busY, busId) {
+    const collisionBuffer = 5;
+    const busWidth = 50;  // Asegúrate de que estos valores coincidan
+    const busHeight = 50; // con las dimensiones reales del bus
+    
+    people = people.filter(person => {
+        const collision = !(
+            person.x + collisionBuffer > busX + busWidth ||
+            person.x - collisionBuffer < busX ||
+            person.y + collisionBuffer > busY + busHeight ||
+            person.y - collisionBuffer < busY
+        );
+        if (collision) {
+            // Incrementar score para el bus específico
+            if (!globalScores[busId]) {
+                globalScores[busId] = 0;
             }
-            return !collision;
-        });
-    }
+            globalScores[busId]++;
+            updateGlobalScore();
+        }
+        return !collision;
+    });
+}
 
     // Función para actualizar la puntuación en el canvas
     function updateScore() {
