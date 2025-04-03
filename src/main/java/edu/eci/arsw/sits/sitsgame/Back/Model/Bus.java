@@ -18,6 +18,7 @@ public class Bus implements Runnable {
     private boolean running = true;
     private final SimpMessagingTemplate messagingTemplate;
     private double angle = 0; // Ángulo de orientación del bus
+    private int passengersCollected = 0; // Número de pasajeros recogidos
 
     private final Lock lock = new ReentrantLock();
     private final Condition moveCondition = lock.newCondition();
@@ -203,6 +204,14 @@ public void move(List<Bus> allBuses) {
             lock.unlock();
         }
     }
+
+    public void passengerCollected() {
+        passengersCollected++;
+        messagingTemplate.convertAndSend("/topic/score", 
+            "SCORE:" + this.plate + "," + passengersCollected);
+    }
+
+    
 
     @Override
     public void run() {
