@@ -70,6 +70,8 @@ function updateBuses() {
         for (let j = i + 1; j < busArray.length; j++) {
             handleCollision(busArray[i], busArray[j]);  // Verificar colisión entre dos buses
         }
+
+        checkCollisionWithPeople(busArray[i].x, busArray[i].y);
     }
 }
 
@@ -148,4 +150,5 @@ function drawBuses() {
         window.ctx.textAlign = "center";
         window.ctx.fillText(id, bus.x + bus.width / 2, bus.y - 5);
     });
+    setInterval(updateBuses, 100);
 }

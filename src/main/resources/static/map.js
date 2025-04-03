@@ -2,6 +2,8 @@ let obstacles = []; // Variable global para almacenar los obstáculos
 let constructionSigns = [];
 let people = []; // Variable global para almacenar las personas
 let peopleGenerated = false; // Variable para controlar la generación única
+let score = 0; // Variable para almacenar el puntaje
+let gameOver = false; // Variable para controlar el estado del juego
 
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
@@ -203,17 +205,17 @@ function createMap() {
             while (constructionSigns.length < numSigns && attempts < 100) {  // Evita bucles infinitos
                 const tileX = Math.floor(Math.random() * mapSize);
                 const tileY = Math.floor(Math.random() * mapSize);
-    
+
                 const offsetX = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
                 const offsetY = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
-    
+
                 const signX = tileX * tileSize + offsetX;
                 const signY = tileY * tileSize + offsetY;
-    
+
                 if (!isPositionOccupied(signX, signY)) {  // Solo agrega si está libre
                     constructionSigns.push({ x: signX, y: signY });
                 }
-    
+
                 attempts++;  // Controla intentos para evitar bucles infinitos
             }
         }
@@ -222,7 +224,7 @@ function createMap() {
     // Función para dibujar una persona
     function drawPerson(x, y, bodyColor, skinColor) {
         const personRadius = 10; // Radio de la persona
-        
+
         // Cuerpo
         ctx.fillStyle = bodyColor || getRandomPersonColor(); // Color de cuerpo
         ctx.beginPath();
@@ -272,8 +274,8 @@ function createMap() {
 
                 // Verificar que no esté ocupada la posición
                 if (!isPositionOccupied(personX, personY)) {
-                    people.push({ 
-                        x: personX, 
+                    people.push({
+                        x: personX,
                         y: personY,
                         bodyColor: getRandomPersonColor(),
                         skinColor: getRandomSkinColor()
@@ -284,31 +286,93 @@ function createMap() {
         }
     }
 
+    //Verificar si el bus pasa sobre una persona
+    function checkCollisionWithPeople(busX, busY) {
+        const collisionBuffer = 5; // Small buffer for more accurate collision
+        people = people.filter(person => {
+            const collision = !(
+                person.x + collisionBuffer > busX + busWidth ||
+                person.x - collisionBuffer < busX ||
+                person.y + collisionBuffer > busY + busHeight ||
+                person.y - collisionBuffer < busY
+            );
+            if (collision) {
+                score++;
+                updateScore(); // Use the correct function name
+            }
+            return !collision;
+        });
+    }
+
+    // Función para actualizar la puntuación en el canvas
+    function updateScore() {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Definir el texto y su posición fija
+        const text = 'Puntuación: ' + score;
+        ctx.font = 'bold 20px Arial';
+
+        // Ancho fijo para el fondo
+        const boxWidth = 200; // Mantiene el tamaño del fondo estable
+        const boxHeight = 30;
+        const x = (canvas.width - boxWidth) / 2;
+        const y = 30; // Posición en la parte superior
+
+        // Dibujar fondo semitransparente
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Negro con 50% de opacidad
+        ctx.fillRect(x, y - 20, boxWidth, boxHeight);
+
+        // Dibujar el texto centrado dentro del fondo
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.fillText(text, canvas.width / 2, y);
+    }
+
+
     // Dibujar las personas en el mapa
     function drawPeople() {
         people.forEach(person => drawPerson(person.x, person.y, person.bodyColor, person.skinColor));
     }
-    
+
     // Dibujar los obstáculos en el mapa
     function drawObstacles() {
         obstacles.forEach(obstacle => drawObstacle(obstacle.x, obstacle.y));
     }
 
     function isPositionOccupied(x, y) {
-        return obstacles.some(obstacle => {
-            return Math.abs(obstacle.x - x) < roadWidth && Math.abs(obstacle.y - y) < roadWidth;
-        });
+        const minDistance = 30; // Minimum distance between objects
+
+        // Check obstacles
+        const hasObstacle = obstacles.some(obstacle =>
+            Math.hypot(obstacle.x - x, obstacle.y - y) < minDistance
+        );
+        if (hasObstacle) return true;
+
+        // Check construction signs
+        const hasSign = constructionSigns.some(sign =>
+            Math.hypot(sign.x - x, sign.y - y) < minDistance
+        );
+        if (hasSign) return true;
+
+        // Check people
+        const hasPerson = people.some(person =>
+            Math.hypot(person.x - x, person.y - y) < minDistance
+        );
+        return hasPerson;
     }
-    
+
     // Dibujar todas las señales generadas
     constructionSigns.forEach(sign => drawConstructionSign(sign.x, sign.y));
 
     // Inicialización y dibujado
+    updateScore(); // Actualiza la puntuación
     generateObstacles(10);
     drawObstacles();
     generateConstructionSigns(5);
     generatePeople(8); // Genera 8 personas
     drawPeople(); // Dibuja las personas
+
 }
 
 // Cargar mapa al inicio
