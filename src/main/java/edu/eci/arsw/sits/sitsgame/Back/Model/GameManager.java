@@ -2,12 +2,17 @@ package edu.eci.arsw.sits.sitsgame.Back.Model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class GameManager {
     private static final ConcurrentMap<String, Bus> buses = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Thread> busThreads = new ConcurrentHashMap<>();
+    private static final List<Passenger> passengers = new ArrayList<>();
+    private static final Random random = new Random();
+    private static final int MAP_WIDTH = 1000;
+    private static final int MAP_HEIGHT = 1000;
 
     public static void addBus(String playerId, Bus bus, Thread busThread) {
         buses.put(playerId, bus);
@@ -43,4 +48,17 @@ public class GameManager {
     public static Bus getBus(String playerId) {
         return buses.get(playerId);
     }
+
+
+    public static List<Passenger> getPassengers() {
+        return passengers;
+    }
+
+    public static void generateRandomPassenger() {
+        int x = random.nextInt(MAP_WIDTH);
+        int y = random.nextInt(MAP_HEIGHT);
+        Passenger newPassenger = new Passenger(x, y);
+        passengers.add(newPassenger);
+    }
+
 }

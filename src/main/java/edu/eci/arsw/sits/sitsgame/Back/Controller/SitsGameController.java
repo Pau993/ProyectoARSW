@@ -1,13 +1,18 @@
 package edu.eci.arsw.sits.sitsgame.Back.Controller;
 
+import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import com.google.gson.Gson;
+
 import edu.eci.arsw.sits.sitsgame.Back.Model.Bus;
 import edu.eci.arsw.sits.sitsgame.Back.Model.GameManager;
+import edu.eci.arsw.sits.sitsgame.Back.Model.Passenger;
 
 @Controller
 public class SitsGameController {
@@ -65,6 +70,15 @@ public class SitsGameController {
         }
 
         return allBusesMessage.toString();
+    }
+
+    @MessageMapping("/generatePassenger")
+    public void generatePassenger() {
+        GameManager.generateRandomPassenger();
+        List<Passenger> passengers = GameManager.getPassengers();
+        
+        String passengersJson = "PASSENGERS" + new Gson().toJson(passengers);
+        messagingTemplate.convertAndSend("/topic/game", passengersJson);
     }
 
     @MessageMapping("/move")

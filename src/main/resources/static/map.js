@@ -222,6 +222,26 @@ function createMap() {
         }
     }
 
+    window.updatePassengers = function(passengersData) {
+        console.log("Datos de pasajeros recibidos:", passengersData);
+        window.passengers = {}; // Reiniciar pasajeros
+    
+        passengersData.forEach(passenger => {
+            window.passengers[passenger.id] = {
+                x: passenger.x,
+                y: passenger.y,
+                bodyColor: getRandomPersonColor(),
+                skinColor: getRandomSkinColor(),
+            };
+        });
+
+        console.log("🎨 Lista de pasajeros actualizada:", window.passengers);
+        console.log("🎯 Iniciando dibujado de personas...");
+    
+        drawPeople();
+    }
+    
+
     // Función para dibujar una persona
     function drawPerson(x, y, bodyColor, skinColor) {
         const personRadius = 10; // Radio de la persona
@@ -340,8 +360,21 @@ function checkCollisionWithPeople(busX, busY, busId) {
 
     // Dibujar las personas en el mapa
     function drawPeople() {
-        people.forEach(person => drawPerson(person.x, person.y, person.bodyColor, person.skinColor));
+    console.log("🖌️ Iniciando drawPeople...");
+    console.log("🗺️ Estado actual de pasajeros:", window.passengers);
+    
+    if (Object.keys(window.passengers).length === 0) {
+        console.warn("⚠️ No hay pasajeros para dibujar");
+        return;
     }
+
+    Object.entries(window.passengers).forEach(([id, passenger]) => {
+        console.log(`🎨 Dibujando pasajero ID: ${id} en (${passenger.x}, ${passenger.y})`);
+        drawPerson(passenger.x, passenger.y, passenger.bodyColor, passenger.skinColor);
+    });
+    
+    console.log("✅ Finalizado el dibujado de personas");
+}
 
     // Dibujar los obstáculos en el mapa
     function drawObstacles() {
@@ -378,7 +411,7 @@ function checkCollisionWithPeople(busX, busY, busId) {
     generateObstacles(10);
     drawObstacles();
     generateConstructionSigns(5);
-    generatePeople(8); // Genera 8 personas
+    generatePeople(6); // Genera 8 personas
     drawPeople(); // Dibuja las personas
 
 }
