@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class GameManager {
@@ -62,24 +61,25 @@ public class GameManager {
         return buses.get(playerId);
     }
 
-
     public static void checkCollisions(String playerId, SimpMessagingTemplate messagingTemplate) {
         Bus bus = buses.get(playerId);
         if (bus != null) {
+            List<Passenger> remainingPassengers = new ArrayList<>();
             synchronized (passengers) {
-                passengers.removeIf(passenger -> {
+                for (Passenger passenger : passengers) {
                     if (isCollision(bus, passenger)) {
                         incrementScore(playerId);
                         generateRandomPassenger(messagingTemplate);
-                        return true;
+                    } else {
+                        remainingPassengers.add(passenger);
                     }
-                    return false;
-                });
+                }
+                passengers.clear();
+                passengers.addAll(remainingPassengers);
             }
         }
     }
     
-
     private static boolean isCollision(Bus bus, Passenger passenger) {
         double distance = Math.sqrt(
             Math.pow(bus.getX() - passenger.getX(), 2) +
