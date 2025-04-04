@@ -82,9 +82,7 @@ function drawBuses() {
     // Limpiar el canvas antes de dibujar
     window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
 
-    createMap();
-
-    buses = Object.fromEntries(
+    window.buses = Object.fromEntries(
         Object.entries(buses).filter(([id, bus]) => bus.x !== undefined && bus.y !== undefined)
     );
 

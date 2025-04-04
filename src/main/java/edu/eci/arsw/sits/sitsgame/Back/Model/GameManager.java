@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,7 +14,8 @@ public class GameManager {
     private static final ConcurrentMap<String, Bus> buses = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Thread> busThreads = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Integer> scores = new ConcurrentHashMap<>();
-    private static final List<Passenger> passengers = new ArrayList<>();
+    private static final List<Passenger> passengers = new CopyOnWriteArrayList<>();
+
     private static final Random random = new Random();
     private static final int MAP_WIDTH = 1000;
     private static final int MAP_HEIGHT = 1000;
