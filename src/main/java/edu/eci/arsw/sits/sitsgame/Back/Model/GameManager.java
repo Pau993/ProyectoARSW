@@ -9,10 +9,19 @@ import java.util.concurrent.ConcurrentMap;
 public class GameManager {
     private static final ConcurrentMap<String, Bus> buses = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Thread> busThreads = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Integer> scores = new ConcurrentHashMap<>();
     private static final List<Passenger> passengers = new ArrayList<>();
     private static final Random random = new Random();
     private static final int MAP_WIDTH = 1000;
     private static final int MAP_HEIGHT = 1000;
+    private static final int COLLISION_DISTANCE = 50;
+
+    // Add this method to the GameManager class
+    
+
+    public static List<Passenger> getPassengers() {
+        return passengers;
+    }
 
     public static void addBus(String playerId, Bus bus, Thread busThread) {
         buses.put(playerId, bus);
@@ -50,8 +59,42 @@ public class GameManager {
     }
 
 
-    public static List<Passenger> getPassengers() {
-        return passengers;
+    public static void checkCollisions(String playerId) {
+        Bus bus = buses.get(playerId);
+        if (bus != null) {
+            passengers.removeIf(passenger -> {
+                if (isCollision(bus, passenger)) {
+                    incrementScore(playerId);
+                    generateRandomPassenger(); // Genera un nuevo pasajero cuando uno es recogido
+                    return true;
+                }
+                return false;
+            });
+        }
+    }
+
+    private static boolean isCollision(Bus bus, Passenger passenger) {
+        double distance = Math.sqrt(
+            Math.pow(bus.getX() - passenger.getX(), 2) +
+            Math.pow(bus.getY() - passenger.getY(), 2)
+        );
+        return distance < COLLISION_DISTANCE;
+    }
+
+    private static void incrementScore(String playerId) {
+        scores.merge(playerId, 1, Integer::sum);
+    }
+
+    public static int getScore(String playerId) {
+        return scores.getOrDefault(playerId, 0);
+    }
+
+    public static void initializeGame(String playerId) {
+        scores.put(playerId, 0);
+        // Generar pasajeros iniciales
+        for (int i = 0; i < 5; i++) {
+            generateRandomPassenger();
+        }
     }
 
     public static void generateRandomPassenger() {
@@ -59,6 +102,18 @@ public class GameManager {
         int y = random.nextInt(MAP_HEIGHT);
         Passenger newPassenger = new Passenger(x, y);
         passengers.add(newPassenger);
+    }
+
+    public static ConcurrentMap<String, Integer> getAllScores() {
+        return scores;
+    }
+
+    public static void resetGame(String playerId) {
+        scores.put(playerId, 0);
+        passengers.clear();
+        for (int i = 0; i < 5; i++) {
+            generateRandomPassenger();
+        }
     }
 
 }

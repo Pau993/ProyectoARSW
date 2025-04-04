@@ -5,6 +5,7 @@ let peopleGenerated = false; // Variable para controlar la generación única
 let score = 0; // Variable para almacenar el puntaje
 let gameOver = false; // Variable para controlar el estado del juego
 let globalScores = {};
+let buses = {}; // Variable global para almacenar los buses
 
 function createMap() {
     const canvas = document.getElementById('gameCanvas');
@@ -222,25 +223,25 @@ function createMap() {
         }
     }
 
-    window.updatePassengers = function(passengersData) {
+    window.updatePassengers = function (passengersData) {
         console.log("Datos de pasajeros recibidos:", passengersData);
         window.passengers = {}; // Reiniciar pasajeros
-    
-        passengersData.forEach(passenger => {
-            window.passengers[passenger.id] = {
-                x: passenger.x,
-                y: passenger.y,
-                bodyColor: getRandomPersonColor(),
-                skinColor: getRandomSkinColor(),
-            };
-        });
 
-        console.log("🎨 Lista de pasajeros actualizada:", window.passengers);
-        console.log("🎯 Iniciando dibujado de personas...");
-    
+        // Asegurarse de que passengersData es un array
+        if (Array.isArray(passengersData)) {
+            passengersData.forEach((passenger, index) => {
+                window.passengers[index] = {
+                    x: passenger.x,
+                    y: passenger.y,
+                    bodyColor: getRandomPersonColor(),
+                    skinColor: getRandomSkinColor(),
+                };
+            });
+        }
+
         drawPeople();
     }
-    
+
 
     // Función para dibujar una persona
     function drawPerson(x, y, bodyColor, skinColor) {
@@ -279,58 +280,75 @@ function createMap() {
 
     // Función para generar personas en la carretera
     function generatePeople(numPeople) {
-        // Solo genera personas si aún no se han generado
-        if (!peopleGenerated) {
-            people = []; // Limpiar personas existentes
-            for (let i = 0; i < numPeople; i++) {
-                const tileX = Math.floor(Math.random() * mapSize);
-                const tileY = Math.floor(Math.random() * mapSize);
 
-                // Posición aleatoria dentro de la carretera del tile
-                const offsetX = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
-                const offsetY = (tileSize - roadWidth) / 2 + Math.random() * roadWidth;
+        // Esta función ya no debería generar personas localmente
+        // En su lugar, solicitar al servidor que genere pasajeros
+        socket.send("/app/generatePassenger", {}, "");
 
-                const personX = tileX * tileSize + offsetX;
-                const personY = tileY * tileSize + offsetY;
-
-                // Verificar que no esté ocupada la posición
-                if (!isPositionOccupied(personX, personY)) {
-                    people.push({
-                        x: personX,
-                        y: personY,
-                        bodyColor: getRandomPersonColor(),
-                        skinColor: getRandomSkinColor()
-                    });
-                }
-            }
-            peopleGenerated = true;
-        }
     }
 
     //Verificar si el bus pasa sobre una persona
-function checkCollisionWithPeople(busX, busY, busId) {
-    const collisionBuffer = 5;
-    const busWidth = 50;  // Asegúrate de que estos valores coincidan
-    const busHeight = 50; // con las dimensiones reales del bus
-    
-    people = people.filter(person => {
-        const collision = !(
-            person.x + collisionBuffer > busX + busWidth ||
-            person.x - collisionBuffer < busX ||
-            person.y + collisionBuffer > busY + busHeight ||
-            person.y - collisionBuffer < busY
-        );
-        if (collision) {
-            // Incrementar score para el bus específico
-            if (!globalScores[busId]) {
-                globalScores[busId] = 0;
-            }
-            globalScores[busId]++;
-            updateGlobalScore();
+    function checkCollisionWithPeople(busX, busY, busId) {
+        // Esta función ahora debe escuchar los eventos del servidor
+        // en lugar de manejar las colisiones localmente
+        socket.send("/app/checkCollision", {}, JSON.stringify({
+            busId: busId,
+            x: busX,
+            y: busY
+        }));
+    }
+    function handleScoreUpdate(scoreData) {
+        globalScores = scoreData;
+        updateGlobalScore();
+    }
+    function drawBuses() {
+        if (!window.ctx || !window.canvas) {
+            console.error("Error: El canvas o el contexto no están inicializados.");
+            return;
         }
-        return !collision;
-    });
-}
+
+        // Limpiar el canvas antes de redibujar
+        window.ctx.clearRect(0, 0, window.canvas.width, window.canvas.height);
+
+        createMap(); // Redibuja el mapa
+
+        Object.entries(buses).forEach(([id, bus]) => {
+            if (bus.x !== undefined && bus.y !== undefined) {
+                console.log(`Dibujando bus ${id} en X: ${bus.x}, Y: ${bus.y}`);
+                drawBus(bus.x, bus.y, bus.angle); // Llama a la función para dibujar el bus
+            } else {
+                console.error(`El bus ${id} no tiene coordenadas válidas.`);
+            }
+        });
+    }
+
+    // Función para escuchar mensajes del servidor
+    function connectWebSocket() {
+        const socket = new SockJS('/game-websocket');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+
+            // Suscribirse a actualizaciones de pasajeros
+            stompClient.subscribe('/topic/game', function (message) {
+                const data = JSON.parse(message.body);
+                if (data.type === "UPDATE:PASSENGERS") {
+                    updatePassengers(data.passengers);
+                } else if (data.type === "UPDATE:SCORES") {
+                    handleScoreUpdate(data.scores);
+                } else if (data.type === "COLLISION") {
+                    handleCollision(data.busId);
+                } else if (data.type === "SCORE") {
+                    score = data.score;
+                    updateScore(); // Actualiza la puntuación en el canvas
+                } else if (data.type === "UPDATE:BUSES") {
+                    buses = data.buses; // Actualiza la lista de buses
+                    drawBuses(); // Redibuja los buses en el canvas
+                }
+            });
+        });
+    }
 
     // Función para actualizar la puntuación en el canvas
     function updateScore() {
@@ -357,24 +375,34 @@ function checkCollisionWithPeople(busX, busY, busId) {
         ctx.fillText(text, canvas.width / 2, y);
     }
 
+    // Modificar para usar el sistema de puntuación del servidor
+    function updateGlobalScore() {
+        const scoreElement = document.getElementById('scoreBoard');
+        let scoreHtml = '<h2>Puntuaciones</h2>';
+        Object.entries(globalScores).forEach(([busId, score]) => {
+            scoreHtml += `<p>Bus ${busId}: ${score}</p>`;
+        });
+        scoreElement.innerHTML = scoreHtml;
+    }
+
 
     // Dibujar las personas en el mapa
     function drawPeople() {
-    console.log("🖌️ Iniciando drawPeople...");
-    console.log("🗺️ Estado actual de pasajeros:", window.passengers);
-    
-    if (Object.keys(window.passengers).length === 0) {
-        console.warn("⚠️ No hay pasajeros para dibujar");
-        return;
-    }
+        console.log(" Iniciando drawPeople...");
+        console.log("Estado actual de pasajeros:", window.passengers);
 
-    Object.entries(window.passengers).forEach(([id, passenger]) => {
-        console.log(`🎨 Dibujando pasajero ID: ${id} en (${passenger.x}, ${passenger.y})`);
-        drawPerson(passenger.x, passenger.y, passenger.bodyColor, passenger.skinColor);
-    });
-    
-    console.log("✅ Finalizado el dibujado de personas");
-}
+        if (Object.keys(window.passengers).length === 0) {
+            console.warn("⚠️ No hay pasajeros para dibujar");
+            return;
+        }
+
+        Object.entries(window.passengers).forEach(([id, passenger]) => {
+            console.log(`Dibujando pasajero ID: ${id} en (${passenger.x}, ${passenger.y})`);
+            drawPerson(passenger.x, passenger.y, passenger.bodyColor, passenger.skinColor);
+        });
+
+        console.log("Finalizado el dibujado de personas");
+    }
 
     // Dibujar los obstáculos en el mapa
     function drawObstacles() {
@@ -396,10 +424,11 @@ function checkCollisionWithPeople(busX, busY, busId) {
         );
         if (hasSign) return true;
 
-        // Check people
-        const hasPerson = people.some(person =>
-            Math.hypot(person.x - x, person.y - y) < minDistance
+        // Sustituir en isPositionOccupied:
+        const hasPerson = Object.values(window.passengers || {}).some(passenger =>
+            Math.hypot(passenger.x - x, passenger.y - y) < minDistance
         );
+
         return hasPerson;
     }
 
