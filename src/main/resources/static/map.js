@@ -143,7 +143,6 @@ function drawBuilding(x, y, color) {
 
 // Dibuja los buses en el mapa
 function drawBus(bus) {
-    // Asegúrate de que el contexto del canvas esté configurado correctamente
     if (!ctx) {
         console.error("Error: El contexto del canvas no está inicializado.");
         return;
@@ -184,7 +183,7 @@ function drawBus(bus) {
     ctx.fillStyle = "black";
     ctx.font = "14px Arial";
     ctx.textAlign = "center";
-    ctx.fillText(bus.id, bus.x + bus.width / 2, bus.y - 5);
+    ctx.fillText(bus.id, bus.x + bus.width / 2, bus.y - 10); // Ajusta la posición de la placa
 }
 
 // Genera pasajeros aleatorios en las zonas verdes
@@ -414,12 +413,20 @@ window.addEventListener('keydown', (e) => {
             moveBus(bus, 'RIGHT');
             break;
     }
-    updateGame();
 });
 
 // Inicializa el juego
 function initGame() {
-    buses['player1'] = { x: randomPosition(), y: randomPosition() }; // Agrega un bus
+    const playerPlate = localStorage.getItem("playerId"); // Obtén la placa registrada o usa "SinPlaca" por defecto
+
+    buses['player1'] = {
+        id: playerPlate, // Asigna la placa como el identificador del bus
+        x: randomPosition(),
+        y: randomPosition(),
+        width: tileSize / 4, // Ajusta el tamaño del bus
+        height: tileSize / 8, // Ajusta el tamaño del bus
+        angle: 0 // Ángulo inicial
+    };
     generatePassengers(5); // Genera 5 pasajeros
     generateObstacles(5); // Genera 5 obstáculos
     updateGame(); // Dibuja el estado inicial
