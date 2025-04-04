@@ -1,5 +1,7 @@
 package edu.eci.arsw.sits.sitsgame.Back.Model;
 
+import java.util.List;
+
 public class Passenger {
     private int x;
     private int y;
@@ -13,6 +15,15 @@ public class Passenger {
         this.isPickedUp = false;
         this.id = "P" + nextId++;
     }
+    
+    public void checkPassengerPickup(Bus bus, List<Passenger> passengers) {
+    for (Passenger passenger : passengers) {
+        if (!passenger.isPickedUp() && passenger.isNearBus(bus)) {
+            passenger.pickUp();
+            System.out.println("Pasajero " + passenger.getId() + " recogido por el bus " + bus.getId());
+        }
+    }
+}
 
     public boolean isNearBus(Bus bus) {
         int pickupRadius = 30;

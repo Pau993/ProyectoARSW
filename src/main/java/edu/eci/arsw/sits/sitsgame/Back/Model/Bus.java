@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 public class Bus implements Runnable {
     private String playerId;
     private String plate;
+    private String id;
     private int x;
     private int y;
     private final int speed = 10;
@@ -38,6 +39,11 @@ public class Bus implements Runnable {
         System.out.println("Buses actuales en el juego: " + GameManager.getAllBuses().size());
 
     }
+
+    public String getId() {
+        return id;
+    }
+
     public String getPlayerId() {
         return playerId;
     }

@@ -115,3 +115,11 @@ button:hover {
     justify-content: center;
     text-align: center;
 }
+
+#gameCanvas {
+    display: block;
+    margin: 20px auto;
+    background-color: #f0f0f0;
+    border: 2px solid black;
+  }
+  

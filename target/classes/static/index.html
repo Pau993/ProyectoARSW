@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body onload="showRulesAlert()">
     <!-- Vista principal -->
     <div id="main-view">
@@ -20,7 +22,7 @@
         </div>
 
         <div id="connection-status" style="margin-top: 10px; font-weight: bold;"></div>
-        
+
     </div>
 
     <!-- Vista de registro de placa -->
@@ -36,6 +38,14 @@
         </div>
     </div>
 
+    <!-- Vista del juego -->
+    <div id="game-view" style="display: none;">
+        <canvas id="gameCanvas"></canvas>
+        <div id="score-display">Puntaje: 0</div>
+        <button onclick="exitGame()">Salir del Juego</button>
+    </div>
+
+
     <!-- 🔹 Incluir librerías necesarias antes de `main.js` -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@latest/bundles/stomp.umd.min.js"></script>
@@ -50,4 +60,5 @@
     </script>
     <script src="main.js"></script>
 </body>
+
 </html>

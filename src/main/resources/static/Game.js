@@ -1,7 +1,6 @@
 window.buses = {}; // Objeto global para almacenar los buses
 window.passengers = {}; // Objeto global para pasajeros
 
-
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Verificando conexión WebSocket...");
     const canvas = document.getElementById("gameCanvas");
