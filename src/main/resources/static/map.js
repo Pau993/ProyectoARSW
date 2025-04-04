@@ -141,13 +141,50 @@ function drawBuilding(x, y, color) {
     ctx.strokeRect(baseX, baseY, buildingSize, buildingSize);
 }
 
-// Dibuja un bus
+// Dibuja los buses en el mapa
 function drawBus(bus) {
+    // Asegúrate de que el contexto del canvas esté configurado correctamente
+    if (!ctx) {
+        console.error("Error: El contexto del canvas no está inicializado.");
+        return;
+    }
+
+    // Guardar la posición original para rotar el bus correctamente
     ctx.save();
-    ctx.translate(bus.x + tileSize / 4, bus.y + tileSize / 4);
-    ctx.fillStyle = 'yellow'; // Color del bus
-    ctx.fillRect(-tileSize / 8, -tileSize / 8, tileSize / 4, tileSize / 4);
+
+    // Mover el contexto del canvas al centro del bus
+    ctx.translate(bus.x + bus.width / 2, bus.y + bus.height / 2);
+
+    // Rotar el contexto según el ángulo
+    ctx.rotate(bus.angle * Math.PI / 180); // Convertir ángulo de grados a radianes
+
+    // Dibujar el cuerpo del bus
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(-bus.width / 2, -bus.height / 2, bus.width, bus.height);
+
+    // Dibujar las ventanas del bus
+    ctx.fillStyle = "blue";
+    const windowPositions = [5, 20, 35];
+    windowPositions.forEach(offset => {
+        ctx.fillRect(-bus.width / 2 + offset, -bus.height / 2 + 5, 10, 10);
+    });
+
+    // Dibujar las ruedas del bus
+    ctx.fillStyle = "black";
+    [10, 40].forEach(offset => {
+        ctx.beginPath();
+        ctx.arc(-bus.width / 2 + offset, bus.height / 2, 5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Restaurar el contexto para dibujar la placa
     ctx.restore();
+
+    // Dibujar la placa encima del bus
+    ctx.fillStyle = "black";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(bus.id, bus.x + bus.width / 2, bus.y - 5);
 }
 
 // Genera pasajeros aleatorios en las zonas verdes
