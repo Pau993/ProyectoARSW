@@ -95,7 +95,10 @@ function suscribirEventos() {
             } else if (message.body.startsWith("PASSENGERS")) {
                 const passengersData = JSON.parse(message.body.substring(10));
                 console.log("📥 Mensaje recibido del servidor - PASAJEROS:", passengersData);
-                window.updatePassengers(passengersData);
+                window.updatePassengers = function(passengerData) {
+                    generatePeople(passengerData); 
+                  };
+                  
             
                 if (Array.isArray(passengersData) && passengersData.length > 0) {
                     console.log(`✅ ${passengersData.length} pasajeros recibidos.`);
