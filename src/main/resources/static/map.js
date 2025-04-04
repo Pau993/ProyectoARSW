@@ -230,24 +230,7 @@ function createMap() {
     }
   }
 
-  window.updatePassengers = function (passengersData) {
-    console.log("Datos de pasajeros recibidos:", passengersData);
-    window.passengers = {}; // Reiniciar pasajeros
 
-    // Asegurarse de que passengersData es un array
-    if (Array.isArray(passengersData)) {
-      passengersData.forEach((passenger, index) => {
-        window.passengers[index] = {
-          x: passenger.x,
-          y: passenger.y,
-          bodyColor: getRandomPersonColor(),
-          skinColor: getRandomSkinColor(),
-        };
-      });
-    }
-
-    drawPeople();
-  };
 
   // Función para dibujar una persona
   function drawPerson(x, y, bodyColor, skinColor) {
@@ -292,7 +275,7 @@ function createMap() {
   }
 
   // Función para generar personas en la carretera
-  function generatePeople(passengerData) {
+  window.generatePeople =function(passengerData) {
     if (!Array.isArray(passengerData)) return;
 
     window.passengers = {}; // limpiar anteriores

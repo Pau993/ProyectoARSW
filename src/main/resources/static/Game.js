@@ -94,18 +94,16 @@ function suscribirEventos() {
                 console.log(`Buses colisionados: ${bus1}, ${bus2}`);
             } else if (message.body.startsWith("PASSENGERS")) {
                 const passengersData = JSON.parse(message.body.substring(10));
-                console.log("📥 Mensaje recibido del servidor - PASAJEROS:", passengersData);
-                window.updatePassengers = function(passengerData) {
-                    generatePeople(passengerData); 
-                  };
-                  
+                console.log("Mensaje recibido del servidor - PASAJEROS:", passengersData);
             
                 if (Array.isArray(passengersData) && passengersData.length > 0) {
                     console.log(`✅ ${passengersData.length} pasajeros recibidos.`);
+                    generatePeople(passengersData); // ✅ Aquí va el render
                 } else {
                     console.warn("⚠️ No se recibieron pasajeros o la lista está vacía.");
                 }
             }
+            
         });
 
         drawBuses();
