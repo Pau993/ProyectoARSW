@@ -5,12 +5,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class GameManager {
     private static final ConcurrentMap<String, Bus> buses = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Thread> busThreads = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Integer> scores = new ConcurrentHashMap<>();
-    private static final List<Passenger> passengers = new ArrayList<>();
+    private static final List<Passenger> passengers = new CopyOnWriteArrayList<>();
+
     private static final Random random = new Random();
     private static final int MAP_WIDTH = 1000;
     private static final int MAP_HEIGHT = 1000;
@@ -18,7 +23,6 @@ public class GameManager {
 
     // Add this method to the GameManager class
     
-
     public static List<Passenger> getPassengers() {
         return passengers;
     }
@@ -59,19 +63,22 @@ public class GameManager {
     }
 
 
-    public static void checkCollisions(String playerId) {
+    public static void checkCollisions(String playerId, SimpMessagingTemplate messagingTemplate) {
         Bus bus = buses.get(playerId);
         if (bus != null) {
-            passengers.removeIf(passenger -> {
-                if (isCollision(bus, passenger)) {
-                    incrementScore(playerId);
-                    generateRandomPassenger(); // Genera un nuevo pasajero cuando uno es recogido
-                    return true;
-                }
-                return false;
-            });
+            synchronized (passengers) {
+                passengers.removeIf(passenger -> {
+                    if (isCollision(bus, passenger)) {
+                        incrementScore(playerId);
+                        generateRandomPassenger(messagingTemplate);
+                        return true;
+                    }
+                    return false;
+                });
+            }
         }
     }
+    
 
     private static boolean isCollision(Bus bus, Passenger passenger) {
         double distance = Math.sqrt(
@@ -89,30 +96,37 @@ public class GameManager {
         return scores.getOrDefault(playerId, 0);
     }
 
-    public static void initializeGame(String playerId) {
+    public static void initializeGame(String playerId, SimpMessagingTemplate messagingTemplate) {
         scores.put(playerId, 0);
-        // Generar pasajeros iniciales
         for (int i = 0; i < 5; i++) {
-            generateRandomPassenger();
+            generateRandomPassenger(messagingTemplate);
         }
     }
 
-    public static void generateRandomPassenger() {
+    public static void generateRandomPassenger(SimpMessagingTemplate messagingTemplate) {
         int x = random.nextInt(MAP_WIDTH);
         int y = random.nextInt(MAP_HEIGHT);
         Passenger newPassenger = new Passenger(x, y);
-        passengers.add(newPassenger);
+        synchronized (passengers) {
+            passengers.add(newPassenger);
+        }
+        messagingTemplate.convertAndSend("/topic/game-state", newPassenger);
+    }
+    
+
+    public static GameState getGameState() {
+        return new GameState(buses, passengers, scores); 
     }
 
     public static ConcurrentMap<String, Integer> getAllScores() {
         return scores;
     }
 
-    public static void resetGame(String playerId) {
+    public static void resetGame(String playerId, SimpMessagingTemplate messagingTemplate) {
         scores.put(playerId, 0);
         passengers.clear();
         for (int i = 0; i < 5; i++) {
-            generateRandomPassenger();
+            generateRandomPassenger(messagingTemplate);
         }
     }
 

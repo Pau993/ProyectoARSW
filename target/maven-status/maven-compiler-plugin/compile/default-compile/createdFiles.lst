@@ -1,7 +1,0 @@
-edu\eci\arsw\sits\sitsgame\Back\Model\Passenger.class
-edu\eci\arsw\sits\sitsgame\Back\Config\WebSocketConfig.class
-edu\eci\arsw\sits\sitsgame\Back\Model\Obstacle.class
-edu\eci\arsw\sits\sitsgame\Back\SitsgameApplication.class
-edu\eci\arsw\sits\sitsgame\Back\Model\Bus.class
-edu\eci\arsw\sits\sitsgame\Back\Controller\SitsGameController.class
-edu\eci\arsw\sits\sitsgame\Back\Model\GameManager.class
