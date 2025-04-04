@@ -1,8 +1,8 @@
-
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Config\WebSocketConfig.java
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Controller\SitsGameController.java
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\Bus.java
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\GameManager.java
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\Obstacle.java
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\Passenger.java
-C:\Users\natal\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\SitsgameApplication.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Config\WebSocketConfig.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Controller\SitsGameController.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\Bus.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\GameManager.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\GameState.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\Obstacle.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\Model\Passenger.java
+D:\ProyectoARSW\src\main\java\edu\eci\arsw\sits\sitsgame\Back\SitsgameApplication.java

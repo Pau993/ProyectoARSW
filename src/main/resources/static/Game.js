@@ -1,5 +1,4 @@
-window.buses = {}; // Objeto global para almacenar los buses
-window.passengers = {}; // Objeto global para pasajeros
+window.buses = {}; // Objeto para almacenar los buses
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Verificando conexión WebSocket...");
@@ -8,11 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error: No se encontró el canvas 'gameCanvas'.");
         return;
     }
-    window.canvas = canvas; 
-    window.ctx = canvas.getContext("2d");
+    window.canvas = canvas; // Hacer `canvas` accesible globalmente
+    window.ctx = canvas.getContext("2d"); // Hacer `ctx` accesible globalmente
 
     console.log("Canvas inicializado");
 
+    // Verificar si la conexión WebSocket está guardada en sessionStorage
     if (sessionStorage.getItem("wsConnected") !== "true") {
         console.error("No hay conexión WebSocket guardada.");
         alert("No estás conectado al WebSocket. Regresando a la página principal.");
@@ -32,6 +32,7 @@ function reconnectWebSocket() {
         onConnect: () => {
             console.log("Reconectado al servidor WebSocket en game.js");
 
+            // Recuperar playerId desde localStorage
             window.playerId = localStorage.getItem("playerId");
             if (!window.playerId) {
                 console.error("No se encontró playerId en localStorage.");
@@ -40,7 +41,7 @@ function reconnectWebSocket() {
                 return;
             }
 
-            suscribirEventos();
+            suscribirEventos(); // Suscribirse al WebSocket
         },
         onStompError: (frame) => {
             console.error("Error en WebSocket:", frame);
@@ -52,8 +53,9 @@ function reconnectWebSocket() {
 function suscribirEventos() {
     const playerId = window.playerId || localStorage.getItem("playerId");
 
+    // Verificar si playerId está definido
     if (!playerId) {
-        console.error("Error: playerId no definido.");
+        console.error("Error: playerId no definido. Asegúrate de que el usuario esté registrado.");
         return;
     }
 
@@ -67,51 +69,43 @@ function suscribirEventos() {
             if (data[0] === "NEW_BUS") {
                 const [id, x, y, plate] = data[1].split(",");
                 if (plate && plate !== "") {
-                    window.buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: 0, plate: plate };
+                    buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: 0, plate: plate };
                     console.log(`Nuevo bus registrado: ID=${id}, X=${x}, Y=${y}, Placa=${plate}`);
                 }
             } else if (data[0] === "ALL_BUSES") {
-                window.buses = {}; 
+                buses = {}; // Reiniciar solo la lista global de buses
                 for (let i = 1; i < data.length; i++) {
                     const [id, plate, x, y, direction] = data[i].split(",");
-                    if (plate && plate !== "") {
-                        window.buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: direction === "LEFT" || direction === "RIGHT" ? 0 : 90, plate: plate };
+                    if (plate && plate !== "") { // Asegurarse de que solo se añaden buses con placas
+                        buses[id] = { x: parseInt(x), y: parseInt(y), width: 50, height: 30, angle: direction === "LEFT" || direction === "RIGHT" ? 0 : 90, plate: plate };
                     }
                 }
             } else if (data[0] === "BUS") {
                 const [id, x, y, angle, plate] = data[1].split(",");
-                if (window.buses[id]) {
-                    window.buses[id].x = parseInt(x);
-                    window.buses[id].y = parseInt(y);
-                    window.buses[id].angle = parseFloat(angle);
-                    window.buses[id].plate = plate;
+                if (buses[id]) {
+                    buses[id].x = parseInt(x);
+                    buses[id].y = parseInt(y);
+                    buses[id].angle = parseFloat(angle); // Actualizar la orientación
+                    buses[id].plate = plate; // Actualizar la placa
                 }
-            } else if (data[0] === "COLLISION") {
+            }else if (data[0] === "COLLISION") {
                 const [bus1, bus2] = data[1].split(",");
-                delete window.buses[bus1];
-                delete window.buses[bus2];
+                delete buses[bus1];
+                delete buses[bus2];
                 console.log(`Buses colisionados: ${bus1}, ${bus2}`);
-            } else if (message.body.startsWith("PASSENGERS")) {
-                const passengersData = JSON.parse(message.body.substring(10));
-                console.log("Mensaje recibido del servidor - PASAJEROS:", passengersData);
-            
-                if (Array.isArray(passengersData) && passengersData.length > 0) {
-                    console.log(`✅ ${passengersData.length} pasajeros recibidos.`);
-                    generatePeople(passengersData); // ✅ Aquí va el render
-                } else {
-                    console.warn("⚠️ No se recibieron pasajeros o la lista está vacía.");
-                }
             }
-            
         });
 
-        drawBuses();
-        updateBuses();
+        drawBuses(); // Dibujar solo los buses con placas
+        updateBuses(); // Actualizar la posición de los buses
     });
 
+
+    // Enviar solicitud para unirse al juego
     console.log("Enviando solicitud de conexión para", playerId);
     window.client.publish({ destination: "/app/join", body: playerId });
 
+    // Capturar teclas y cambiar dirección
     document.addEventListener("keydown", (event) => {
         let direction = null;
         switch (event.key) {
@@ -125,15 +119,6 @@ function suscribirEventos() {
             window.client.publish({ destination: "/app/move", body: playerId + ":" + direction });
         }
     });
-}
 
-function requestPassengers() {
-    if (window.client.connected) {
-        window.client.publish({
-            destination: "/app/generatePassenger",
-            body: ""
-        });
-    }
+    
 }
-
-setTimeout(requestPassengers, 1000);

@@ -296,7 +296,6 @@ function drawObstacle(obstacle) {
         ctx.arc(obstacle.x, obstacle.y, size, 0, Math.PI * 2); // Dibuja el círculo
         ctx.fill();
         ctx.stroke();
-        console.log(obstacles);
     } else if (obstacle.type === 'triangle') {
         ctx.fillStyle = 'yellow'; // Relleno amarillo
         ctx.strokeStyle = 'black'; // Bordes negros

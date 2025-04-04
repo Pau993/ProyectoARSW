@@ -2,7 +2,6 @@ package edu.eci.arsw.sits.sitsgame.Back.Controller;
 
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -57,39 +56,27 @@ public class SitsGameController {
 
             GameManager.addBus(playerId, newBus, busThread);
             busThread.start();
-            GameManager.initializeGame(playerId, messagingTemplate); 
-
-            if (GameManager.getPassengers().isEmpty()) {
-                for (int i = 0; i < 5; i++) {
-                    GameManager.generateRandomPassenger(messagingTemplate);
-                }
-            }
         }
 
-        GameManager.removeInactiveBuses();
+        GameManager.removeInactiveBuses(); // Eliminar buses huérfanos
 
-        StringBuilder gameState = new StringBuilder("GAME_STATE");
-
-        gameState.append(":BUSES");
+        StringBuilder allBusesMessage = new StringBuilder("ALL_BUSES");
         for (Bus bus : GameManager.getAllBuses()) {
-            gameState.append(":")
+            allBusesMessage.append(":")
                     .append(bus.getPlayerId()).append(",")
                     .append(bus.getX()).append(",")
                     .append(bus.getY()).append(",")
                     .append(bus.getDirection());
         }
 
-        gameState.append(":PASSENGERS").append(new Gson().toJson(GameManager.getPassengers()));
-        gameState.append(":SCORES").append(new Gson().toJson(GameManager.getAllScores()));
-
-        return gameState.toString();
+        return allBusesMessage.toString();
     }
 
     @MessageMapping("/generatePassenger")
     public void generatePassenger() {
         GameManager.generateRandomPassenger(messagingTemplate);
         List<Passenger> passengers = GameManager.getPassengers();
-
+        
         String passengersJson = "PASSENGERS" + new Gson().toJson(passengers);
         messagingTemplate.convertAndSend("/topic/game", passengersJson);
     }
@@ -105,24 +92,30 @@ public class SitsGameController {
 
         Bus bus = GameManager.getBus(playerId);
         if (bus != null && isValidMove(bus, direction)) {
+            // Verificar si hay colisión con otro bus
             for (Bus otherBus : GameManager.getAllBuses()) {
-                if (!otherBus.getPlayerId().equals(playerId) && isCollision(bus, otherBus)) {
-                    handleBusCollision(bus, otherBus);
-                    return;
+                if (!otherBus.getPlayerId().equals(playerId)) {
+                    // Verificar colisión con otro bus
+                    if (isCollision(bus, otherBus)) {
+                        // Elegir aleatoriamente qué bus eliminar
+                        Bus busToRemove = Math.random() < 0.5 ? bus : otherBus;
+                        GameManager.removeBus(busToRemove.getPlayerId()); // Eliminar el bus elegido
+                        messagingTemplate.convertAndSend("/topic/game", "COLLISION:" + busToRemove.getPlayerId());
+                        return; // Salir después de eliminar el bus
+                    }
                 }
             }
 
-            GameManager.checkCollisions(playerId, messagingTemplate);
+            // Si no hay colisión, mover el bus
             bus.setDirection(direction);
             bus.allowMove();
             bus.move(GameManager.getAllBuses());
-
-            sendGameStateUpdate();
         }
     }
 
     private boolean isCollision(Bus bus1, Bus bus2) {
-        
+        // Detecta colisión entre dos buses. La lógica puede variar según cómo defines
+        // colisión.
         return bus1.getX() < bus2.getX() + BUS_SIZE &&
                 bus1.getX() + BUS_SIZE > bus2.getX() &&
                 bus1.getY() < bus2.getY() + BUS_SIZE &&
@@ -146,25 +139,4 @@ public class SitsGameController {
                 return false;
         }
     }
-
-    private void handleBusCollision(Bus bus1, Bus bus2) {
-        Bus busToRemove = Math.random() < 0.5 ? bus1 : bus2;
-        GameManager.removeBus(busToRemove.getPlayerId());
-        messagingTemplate.convertAndSend("/topic/game", "COLLISION:" + busToRemove.getPlayerId());
-    }
-
-    private void sendGameStateUpdate() {
-        String passengersJson = new Gson().toJson(GameManager.getPassengers());
-        String scoresJson = new Gson().toJson(GameManager.getAllScores());
-
-        messagingTemplate.convertAndSend("/topic/game", "UPDATE:PASSENGERS:" + passengersJson);
-        messagingTemplate.convertAndSend("/topic/game", "UPDATE:SCORES:" + scoresJson);
-    }
-
-    @MessageMapping("/reset")
-    public void resetGame(String playerId) {
-        GameManager.resetGame(playerId, messagingTemplate);
-        sendGameStateUpdate();
-    }
-
 }
