@@ -105,9 +105,9 @@ public class GameManager {
         int x = random.nextInt(MAP_WIDTH);
         int y = random.nextInt(MAP_HEIGHT);
         Passenger newPassenger = new Passenger(x, y);
-        passengers.add(newPassenger);
-        
-        // Enviar estado actualizado a los clientes (asumiendo uso de SimpMessagingTemplate)
+        synchronized (passengers) {
+            passengers.add(newPassenger);
+        }
         messagingTemplate.convertAndSend("/topic/game-state", newPassenger);
     }
     
