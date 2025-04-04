@@ -57,11 +57,11 @@ public class SitsGameController {
 
             GameManager.addBus(playerId, newBus, busThread);
             busThread.start();
-            GameManager.initializeGame(playerId, messagingTemplate); // ✅ FIX
+            GameManager.initializeGame(playerId, messagingTemplate); 
 
             if (GameManager.getPassengers().isEmpty()) {
                 for (int i = 0; i < 5; i++) {
-                    GameManager.generateRandomPassenger(messagingTemplate); // ✅ FIX
+                    GameManager.generateRandomPassenger(messagingTemplate);
                 }
             }
         }
