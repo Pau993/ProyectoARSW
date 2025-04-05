@@ -101,7 +101,7 @@ function drawBuses() {
         windowPositions.forEach(offset => {
             window.ctx.fillRect(-bus.width / 2 + offset, -bus.height / 2 + 5, 10, 10);
         });
-
+        bus.id = id; // Asignar el ID del bus al objeto bus
         // Ruedas del bus
         window.ctx.fillStyle = "black";
         [10, 40].forEach(offset => {
