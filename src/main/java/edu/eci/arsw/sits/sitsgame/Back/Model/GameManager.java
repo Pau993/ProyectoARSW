@@ -130,4 +130,8 @@ public class GameManager {
         }
     }
 
+    public static void clearPassengers(){
+        passengers.clear();
+    }
+
 }

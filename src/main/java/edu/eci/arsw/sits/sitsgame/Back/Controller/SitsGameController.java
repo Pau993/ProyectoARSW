@@ -76,8 +76,14 @@ public class SitsGameController {
     public void generatePassenger() {
         int cantidad = 5;
 
-        for (int i = 0; i < cantidad; i++) {
-            GameManager.generateRandomPassenger(messagingTemplate);
+        if (GameManager.getPassengers().isEmpty()) {
+            System.out.println("🟡 Lista de pasajeros vacía, generando " + cantidad + " nuevos pasajeros...");
+
+            for (int i = 0; i < cantidad; i++) {
+                GameManager.generateRandomPassenger(messagingTemplate);
+            }
+        } else {
+            System.out.println("🟢 Lista de pasajeros NO está vacía. Enviando los existentes.");
         }
 
         List<Passenger> passengers = GameManager.getPassengers();
