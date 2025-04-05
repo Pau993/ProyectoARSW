@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SitsgameApplication {
 
 	public static void main(String[] args) {
-        // Iniciar la aplicación Spring Boot
         SpringApplication.run(SitsgameApplication.class, args);
     }
 

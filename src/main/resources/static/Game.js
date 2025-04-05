@@ -1,5 +1,5 @@
-window.buses = {}; // Objeto para almacenar los buses
-window.passengers = {}; // Objeto global para pasajeros
+window.buses = {};
+window.passengers = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Verificando conexión WebSocket...");
@@ -8,12 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Error: No se encontró el canvas 'gameCanvas'.");
     return;
   }
-  window.canvas = canvas; // Hacer `canvas` accesible globalmente
-  window.ctx = canvas.getContext("2d"); // Hacer `ctx` accesible globalmente
+  window.canvas = canvas;
+  window.ctx = canvas.getContext("2d");
 
   console.log("Canvas inicializado");
 
-  // Verificar si la conexión WebSocket está guardada en sessionStorage
+
   if (sessionStorage.getItem("wsConnected") !== "true") {
     console.error("No hay conexión WebSocket guardada.");
     alert("No estás conectado al WebSocket. Regresando a la página principal.");
@@ -35,7 +35,7 @@ function reconnectWebSocket() {
     onConnect: () => {
       console.log("Reconectado al servidor WebSocket en game.js");
 
-      // Recuperar playerId desde localStorage
+
       window.playerId = localStorage.getItem("playerId");
       if (!window.playerId) {
         console.error("No se encontró playerId en localStorage.");
@@ -44,7 +44,7 @@ function reconnectWebSocket() {
         return;
       }
 
-      suscribirEventos(); // Suscribirse al WebSocket
+      suscribirEventos();
     },
     onStompError: (frame) => {
       console.error("Error en WebSocket:", frame);
@@ -56,7 +56,7 @@ function reconnectWebSocket() {
 function suscribirEventos() {
   const playerId = window.playerId || localStorage.getItem("playerId");
 
-  // Verificar si playerId está definido
+
   if (!playerId) {
     console.error(
       "Error: playerId no definido. Asegúrate de que el usuario esté registrado."
@@ -73,17 +73,17 @@ function suscribirEventos() {
     lines.forEach((line) => {
       const data = line.split(":");
 
-      // Manejar puntajes individuales
+
       if (data[0] === "SCORES") {
         const scoresData = JSON.parse(data[1]);
         console.log("Puntajes recibidos:", scoresData);
 
-        // Actualizar el objeto global de puntajes
+
         Object.keys(scoresData).forEach((playerId) => {
           window.scores[playerId] = scoresData[playerId];
         });
 
-        // Renderizar los puntajes
+
         renderScores();
       }
 
@@ -103,11 +103,10 @@ function suscribirEventos() {
           );
         }
       } else if (data[0] === "ALL_BUSES") {
-        buses = {}; // Reiniciar solo la lista global de buses
+        buses = {};
         for (let i = 1; i < data.length; i++) {
           const [id, plate, x, y, direction] = data[i].split(",");
           if (plate && plate !== "") {
-            // Asegurarse de que solo se añaden buses con placas
             buses[id] = {
               x: parseInt(x),
               y: parseInt(y),
@@ -123,8 +122,8 @@ function suscribirEventos() {
         if (buses[id]) {
           buses[id].x = parseInt(x);
           buses[id].y = parseInt(y);
-          buses[id].angle = parseFloat(angle); // Actualizar la orientación
-          buses[id].plate = plate; // Actualizar la placa
+          buses[id].angle = parseFloat(angle);
+          buses[id].plate = plate;
         }
       } else if (data[0].startsWith("COLLISION")) {
         const [collisionData, outData] = message.body.split("|");
@@ -151,17 +150,17 @@ function suscribirEventos() {
         console.log("Mensaje recibido del servidor: PASAJEROS", passengerData);
         if (Array.isArray(passengerData) && passengerData.length > 0) {
           console.log(`✅ ${passengerData.length} pasajeros recibidos.`);
-          generatePeople(passengerData); // ✅ Aquí va el render
+          generatePeople(passengerData);
         } else {
           console.warn("⚠️ No se recibieron pasajeros o la lista está vacía.");
         }
       }
     });
-    drawBuses(); // Dibujar solo los buses con placas
-    updateBuses(); // Actualizar la posición de los buses
+    drawBuses();
+    updateBuses();
   });
 
-  // Función para renderizar los puntajes en el canvas o en un elemento HTML
+
   function renderScores() {
     const scoresContainer = document.getElementById("scoresContainer");
     if (!scoresContainer) {
@@ -169,10 +168,10 @@ function suscribirEventos() {
       return;
     }
 
-    // Limpiar el contenedor antes de actualizar
+
     scoresContainer.innerHTML = "";
 
-    // Crear una lista de puntajes
+
     Object.entries(window.scores).forEach(([playerId, score]) => {
       const scoreElement = document.createElement("div");
       scoreElement.textContent = `Jugador ${playerId}: ${score} puntos`;
@@ -180,11 +179,11 @@ function suscribirEventos() {
     });
   }
 
-  // Enviar solicitud para unirse al juego
+
   console.log("Enviando solicitud de conexión para", playerId);
   window.client.publish({ destination: "/app/join", body: playerId });
 
-  // Capturar teclas y cambiar dirección
+
   document.addEventListener("keydown", (event) => {
     let direction = null;
     switch (event.key) {
@@ -231,13 +230,13 @@ function suscribirEventos() {
 
   function closeConnection() {
     if (window.client && window.client.connected) {
-      window.client.deactivate(); // cierra la conexión STOMP segura
+      window.client.deactivate();
       console.log("🔌 Desconectado del servidor tras colisión");
       setTimeout(() => {
-        window.location.href = "index.html"; // o reload si prefieres
+        window.location.href = "index.html";s
       }, 1000);
     } else {
-      window.location.href = "index.html"; // fallback por si no está conectado
+      window.location.href = "index.html"; 
     }
   }
 

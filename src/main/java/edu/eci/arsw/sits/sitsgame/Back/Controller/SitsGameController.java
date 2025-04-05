@@ -19,12 +19,11 @@ public class SitsGameController {
 
     private final Random random = new Random();
 
-    private final int TILE_SIZE = 200; // Tamaño de cada tile
-    private final int MAP_WIDTH = TILE_SIZE * 5; // 5x5 tiles
+    private final int TILE_SIZE = 200;
+    private final int MAP_WIDTH = TILE_SIZE * 5;
     private final int MAP_HEIGHT = TILE_SIZE * 5;
-    private final int BUS_SIZE = 50; // Tamaño del bus
-    private final int ROAD_WIDTH = BUS_SIZE * 2; // Ancho de la carretera
-
+    private final int BUS_SIZE = 50;
+    private final int ROAD_WIDTH = BUS_SIZE * 2;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
@@ -58,7 +57,7 @@ public class SitsGameController {
             busThread.start();
         }
 
-        GameManager.removeInactiveBuses(); // Eliminar buses huérfanos
+        GameManager.removeInactiveBuses();
 
         StringBuilder allBusesMessage = new StringBuilder("ALL_BUSES");
         for (Bus bus : GameManager.getAllBuses()) {
