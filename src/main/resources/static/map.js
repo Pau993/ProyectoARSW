@@ -187,25 +187,16 @@ function drawBus(bus) {
 }
 
 // Genera pasajeros aleatorios en las zonas verdes
-function generatePassengers(num) {
-    passengers = []; // Limpiar pasajeros existentes
-    for (let i = 0; i < num; i++) {
-        let passengerX, passengerY;
-
-        // Generar posición aleatoria hasta que esté en una zona verde
-        do {
-            passengerX = Math.random() * canvas.width;
-            passengerY = Math.random() * canvas.height;
-        } while (isPositionOccupied(passengerX, passengerY)); // Evitar carreteras
-
-        passengers.push({
-            x: passengerX,
-            y: passengerY,
-            bodyColor: getRandomPersonColor(),
-            skinColor: getRandomSkinColor()
-        });
-    }
+function generatePeople(passengerArray) {
+    passengers = passengerArray.map(p => ({
+        ...p,
+        bodyColor: p.bodyColor || getRandomPersonColor(),
+        skinColor: p.skinColor || getRandomSkinColor()
+    }));
 }
+
+window.generatePeople = generatePeople;
+
 
 // Dibuja los pasajeros (como personas)
 function drawPassenger(passenger) {
@@ -426,7 +417,6 @@ function initGame() {
         height: tileSize / 8, // Ajusta el tamaño del bus
         angle: 0 // Ángulo inicial
     };
-    generatePassengers(5); // Genera 5 pasajeros
     generateObstacles(5); // Genera 5 obstáculos
     updateGame(); // Dibuja el estado inicial
 }

@@ -74,9 +74,13 @@ public class SitsGameController {
 
     @MessageMapping("/generatePassenger")
     public void generatePassenger() {
-        GameManager.generateRandomPassenger(messagingTemplate);
+        int cantidad = 5;
+
+        for (int i = 0; i < cantidad; i++) {
+            GameManager.generateRandomPassenger(messagingTemplate);
+        }
+
         List<Passenger> passengers = GameManager.getPassengers();
-        
         String passengersJson = "PASSENGERS" + new Gson().toJson(passengers);
         messagingTemplate.convertAndSend("/topic/game", passengersJson);
     }

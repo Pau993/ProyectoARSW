@@ -126,7 +126,6 @@ function suscribirEventos() {
         }
       }
     });
-
     drawBuses(); // Dibujar solo los buses con placas
     updateBuses(); // Actualizar la posición de los buses
   });
