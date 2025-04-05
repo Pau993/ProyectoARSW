@@ -17,10 +17,9 @@ public class Obstacle {
     }
 
     public boolean collidesWith(Bus bus) {
-        int busWidth = 50;  // Ancho del bus
-        int busHeight = 100; // Alto del bus
-        
-        // Verificar si hay intersección entre el obstáculo y el bus
+        int busWidth = 50;
+        int busHeight = 100;
+    
         boolean collision = this.x < (bus.getX() + busWidth) &&
                           (this.x + this.width) > bus.getX() &&
                           this.y < (bus.getY() + busHeight) &&
@@ -29,7 +28,6 @@ public class Obstacle {
         return collision;
     }
 
-    // Getters
     public int getX() { return x; }
     public int getY() { return y; }
     public int getWidth() { return width; }

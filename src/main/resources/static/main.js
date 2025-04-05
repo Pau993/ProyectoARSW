@@ -42,7 +42,7 @@ function connectWebSocket() {
             console.log("Conectado al servidor WebSocket");
             alert("Conectado al WebSocket correctamente.");
             
-            // Guardar estado de conexión
+
             sessionStorage.setItem("wsConnected", "true");
         },
         onStompError: (frame) => {
@@ -96,15 +96,13 @@ function registerUser() {
     const plate = generatePlate();
     document.getElementById('plate').value = plate;
 
-    // Guardar usuario y placa en localStorage
+
     localStorage.setItem("username", user);
     localStorage.setItem("playerId", plate);
 
-    // Enviar la placa y el usuario al servidor
     const message = `${user}:${plate}`;
     window.client.publish({ destination: "/app/join", body: message });
 
-    // Mostrar botón de iniciar juego
     document.getElementById("register-button").style.display = "none";
     document.getElementById("start-game-button").style.display = "block";
 
@@ -118,6 +116,5 @@ function startGame() {
         return;
     }
 
-    // Redirigir al juego con la placa asignada
     window.location.href = `game.html?plate=${encodeURIComponent(plate)}`;
 }

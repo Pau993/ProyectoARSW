@@ -138,7 +138,7 @@ public class Bus implements Runnable {
                 lock.unlock();
             }
 
-            move(); // movimiento simple sin colisiones
+            move();
 
             messagingTemplate.convertAndSend(
                     "/topic/game",

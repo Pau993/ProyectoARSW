@@ -1,30 +1,23 @@
-let gameOver = false; // Bandera para indicar si el juego terminó
-let buses = {}; // Almacena los buses
-let passengers = []; // Almacena los pasajeros
-let obstacles = []; // Almacena los obstáculos
-let score = 0; // Puntaje global
-const tileSize = 200; // Tamaño de cada tile
-const mapSize = 5; // Tamaño del mapa (5x5)
+let gameOver = false;
+let buses = {};
+let passengers = [];
+let obstacles = [];
+let score = 0;
+const tileSize = 200;
+const mapSize = 5;
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-let people = []; // Almacena las personas
-let peopleGenerated = false; // Bandera para evitar regenerar personas
-
-// Inicializa el canvas
+let people = [];
+let peopleGenerated = false;
 canvas.width = tileSize * mapSize;
 canvas.height = tileSize * mapSize;
-
-// Genera una posición aleatoria dentro del mapa
 function randomPosition() {
     return Math.floor(Math.random() * mapSize) * tileSize + tileSize / 4;
 }
 
-// Dibuja el mapa
 function drawMap() {
     ctx.fillStyle = '#90EE90'; // Fondo verde
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Dibuja las carreteras
     for (let x = 0; x < mapSize; x++) {
         for (let y = 0; y < mapSize; y++) {
             drawRoad(x * tileSize, y * tileSize, true, true);

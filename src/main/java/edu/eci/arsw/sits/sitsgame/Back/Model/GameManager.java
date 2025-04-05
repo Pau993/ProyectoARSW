@@ -14,13 +14,9 @@ public class GameManager {
     private static final ConcurrentMap<String, Thread> busThreads = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Integer> scores = new ConcurrentHashMap<>();
     private static final List<Passenger> passengers = new CopyOnWriteArrayList<>();
-
     private static final Random random = new Random();
     private static final int MAP_WIDTH = 1000;
     private static final int MAP_HEIGHT = 1000;
-
-    // Add this method to the GameManager class
-
     public static List<Passenger> getPassengers() {
         return passengers;
     }
@@ -35,7 +31,7 @@ public class GameManager {
         if (bus != null) {
             Thread busThread = busThreads.remove(playerId);
             if (busThread != null && busThread.isAlive()) {
-                busThread.interrupt(); // Detener el thread del bus
+                busThread.interrupt();
             }
         }
     }
@@ -85,7 +81,7 @@ public class GameManager {
     }
 
     private static boolean isCollision(Bus bus1, Bus bus2) {
-        int BUS_SIZE = 40; // ajusta esto al tamaño real de los buses
+        int BUS_SIZE = 40; 
         return bus1.getX() < bus2.getX() + BUS_SIZE &&
                 bus1.getX() + BUS_SIZE > bus2.getX() &&
                 bus1.getY() < bus2.getY() + BUS_SIZE &&

@@ -30,11 +30,11 @@ public class Passenger {
         int busWidth = 50;
         int busHeight = 100;
         
-        // Calcular centro del bus
+
         int busCenterX = bus.getX() + busWidth/2;
         int busCenterY = bus.getY() + busHeight/2;
         
-        // Calcular distancia
+
         double distance = Math.sqrt(
             Math.pow(busCenterX - x, 2) + 
             Math.pow(busCenterY - y, 2)
@@ -43,7 +43,7 @@ public class Passenger {
         return distance <= pickupRadius;
     }
 
-    // Getters
+
     public int getX() { return x; }
     public int getY() { return y; }
     public String getId() { return id; }
