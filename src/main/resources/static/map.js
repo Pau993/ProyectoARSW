@@ -1,3 +1,4 @@
+
 let buses = {}; // Almacena los buses
 let passengers = []; // Almacena los pasajeros
 let obstacles = []; // Almacena los obstáculos
@@ -157,8 +158,18 @@ function drawBus(bus) {
     // Rotar el contexto según el ángulo
     ctx.rotate(bus.angle * Math.PI / 180); // Convertir ángulo de grados a radianes
 
+    // Cambiar el color del bus según la puntuación
+    let busColor;
+    if (score >= 10) {
+        busColor = "red"; // Rojo si la puntuación es 10 o más
+    } else if (score >= 5) {
+        busColor = "green"; // Verde si la puntuación es 5 o más
+    } else {
+        busColor = "yellow"; // Amarillo por defecto
+    }
+
     // Dibujar el cuerpo del bus
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = busColor;
     ctx.fillRect(-bus.width / 2, -bus.height / 2, bus.width, bus.height);
 
     // Dibujar las ventanas del bus
@@ -187,12 +198,27 @@ function drawBus(bus) {
 }
 
 // Genera pasajeros aleatorios en las zonas verdes
-function generatePeople(passengerArray) {
-    passengers = passengerArray.map(p => ({
-        ...p,
-        bodyColor: p.bodyColor || getRandomPersonColor(),
-        skinColor: p.skinColor || getRandomSkinColor()
-    }));
+function generatePeople(passengerArray = []) {
+    const minPassengers = 10; // Número mínimo de pasajeros
+    const passengersToGenerate = Math.max(minPassengers - passengerArray.length, 0);
+
+    // Generar pasajeros adicionales si es necesario
+    for (let i = 0; i < passengersToGenerate; i++) {
+        const x = randomPosition();
+        const y = randomPosition();
+
+        // Asegúrate de que el pasajero no esté en una posición ocupada por una carretera
+        if (!isPositionOccupied(x, y)) {
+            passengerArray.push({
+                x,
+                y,
+                bodyColor: getRandomPersonColor(),
+                skinColor: getRandomSkinColor()
+            });
+        }
+    }
+
+    passengers = passengerArray;
 }
 
 window.generatePeople = generatePeople;
@@ -361,6 +387,7 @@ function checkCollisions(bus) {
         }
     });
 }
+
 
 // Actualiza el estado del juego
 function updateGame() {
