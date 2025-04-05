@@ -1,3 +1,4 @@
+let gameOver = false; // Bandera para indicar si el juego terminó
 let buses = {}; // Almacena los buses
 let passengers = []; // Almacena los pasajeros
 let obstacles = []; // Almacena los obstáculos
@@ -157,8 +158,18 @@ function drawBus(bus) {
     // Rotar el contexto según el ángulo
     ctx.rotate(bus.angle * Math.PI / 180); // Convertir ángulo de grados a radianes
 
+    // Cambiar el color del bus según la puntuación
+    let busColor;
+    if (score >= 20) {
+        busColor = "red"; // Rojo si la puntuación es 10 o más
+    } else if (score >= 10) {
+        busColor = "green"; // Verde si la puntuación es 5 o más
+    } else {
+        busColor = "yellow"; // Amarillo por defecto
+    }
+
     // Dibujar el cuerpo del bus
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = busColor;
     ctx.fillRect(-bus.width / 2, -bus.height / 2, bus.width, bus.height);
 
     // Dibujar las ventanas del bus
@@ -187,12 +198,27 @@ function drawBus(bus) {
 }
 
 // Genera pasajeros aleatorios en las zonas verdes
-function generatePeople(passengerArray) {
-    passengers = passengerArray.map(p => ({
-        ...p,
-        bodyColor: p.bodyColor || getRandomPersonColor(),
-        skinColor: p.skinColor || getRandomSkinColor()
-    }));
+function generatePeople(passengerArray = []) {
+    const minPassengers = 40; // Número mínimo de pasajeros
+    const passengersToGenerate = Math.max(minPassengers - passengerArray.length, 0);
+
+    // Generar pasajeros adicionales si es necesario
+    for (let i = 0; i < passengersToGenerate; i++) {
+        const x = randomPosition();
+        const y = randomPosition();
+
+        // Asegúrate de que el pasajero no esté en una posición ocupada por una carretera
+        if (!isPositionOccupied(x, y)) {
+            passengerArray.push({
+                x,
+                y,
+                bodyColor: getRandomPersonColor(),
+                skinColor: getRandomSkinColor()
+            });
+        }
+    }
+
+    passengers = passengerArray;
 }
 
 window.generatePeople = generatePeople;
@@ -327,67 +353,111 @@ function moveBus(bus, direction) {
 
 // Detecta colisiones entre un bus y los pasajeros
 function checkCollisions(bus) {
-    const pickupRadius = tileSize / 3; // Define un radio de proximidad para recoger pasajeros
+    const pickupRadius = tileSize / 3;
+    const collisionRadius = tileSize / 3;
 
+    // Pasajeros
     passengers = passengers.filter(passenger => {
-        const distance = Math.sqrt(
-            Math.pow(bus.x + tileSize / 8 - passenger.x, 2) +
-            Math.pow(bus.y + tileSize / 8 - passenger.y, 2)
-        );
+        const dx = bus.x + tileSize / 8 - passenger.x;
+        const dy = bus.y + tileSize / 8 - passenger.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < pickupRadius) { // Si el pasajero está dentro del radio de proximidad
+        if (distance < pickupRadius) {
             console.log(`Pasajero recogido en posición (${passenger.x}, ${passenger.y})`);
-            score++; // Incrementa el puntaje
-            return false; // Elimina al pasajero de la lista
+            score++;
+            return false; // Elimina al pasajero
         }
-        return true; // Mantén al pasajero si no está dentro del rango
+        return true; // Mantén al pasajero
     });
 
-    // Detecta colisiones con obstáculos
-    obstacles.forEach(obstacle => {
-        const distance = Math.sqrt(
-            Math.pow(bus.x + tileSize / 8 - obstacle.x, 2) +
-            Math.pow(bus.y + tileSize / 8 - obstacle.y, 2)
-        );
+    // Si el bus no tiene un historial de colisiones, lo creamos
+    if (!bus.collidedObstacles) bus.collidedObstacles = new Set();
 
-        if (distance < tileSize / 4) {
-            if (obstacle.type === 'circle') {
-                console.log('Colisión con obstáculo circular');
-                score = Math.max(0, score - 1); // Resta 1 punto
-            } else if (obstacle.type === 'triangle') {
-                console.log('Colisión con obstáculo triangular');
-                score = Math.max(0, score - 2); // Resta 2 puntos
+    // Obstáculos
+    obstacles.forEach(obstacle => {
+        const dx = bus.x + tileSize / 8 - obstacle.x;
+        const dy = bus.y + tileSize / 8 - obstacle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const obstacleId = `${obstacle.x},${obstacle.y}`;
+
+        if (distance < collisionRadius) {
+            if (!bus.collidedObstacles.has(obstacleId)) {
+                if (obstacle.type === 'circle') {
+                    const penalty = Math.ceil(score / 2); // Redondea hacia arriba
+                    console.log(`Colisión con obstáculo circular (-${penalty})`);
+                    score = Math.max(0, score - penalty);
+                } else if (obstacle.type === 'triangle') {
+                    console.log('Colisión con obstáculo triangular ');
+                    score = Math.max(0, score - 2);
+                }
+
+                bus.collidedObstacles.add(obstacleId); // Marcar como colisionado
             }
+        } else {
+            // Si ya no hay colisión, se puede eliminar del historial
+            bus.collidedObstacles.delete(obstacleId);
+        }
+
+        // Si el puntaje llega a 0, termina el juego
+        if (score === 20) {
+            gameOver = true;
         }
     });
 }
+
 
 // Actualiza el estado del juego
 function updateGame() {
-    drawMap();
+    if (gameOver) {
+        // Mostrar pantalla de Game Over
+        ctx.fillStyle = '#22424a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height); // Reinicia el campo
+        ctx.fillStyle = '#e8dbb0';
+        ctx.font = '30px Monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('Game Win - Score: ' + score, canvas.width / 2, canvas.height / 2);
+        ctx.fillText('SPACE to continue', canvas.width / 2, canvas.height / 2 + 50);
+        const spaceHandler = (e) => {
+            if (e.code === 'Space') {
+                window.removeEventListener('keydown', spaceHandler); // Clean up listener
+                window.location.href = '/'; // Redirect to root path
+            }
+        };
+        window.addEventListener('keydown', spaceHandler);
+    } else {
+        drawMap();
 
-    // Dibuja los pasajeros
-    passengers.forEach(drawPassenger);
+        // Dibuja los pasajeros
+        passengers.forEach(drawPassenger);
 
-    // Dibuja los obstáculos
-    obstacles.forEach(drawObstacle);
+        // Dibuja los obstáculos
+        obstacles.forEach(drawObstacle);
 
-    // Dibuja los buses
-    Object.values(buses).forEach(bus => {
-        drawBus(bus);
-        checkCollisions(bus); // Verifica colisiones con pasajeros y obstáculos
-    });
+        // Dibuja los buses
+        Object.values(buses).forEach(bus => {
+            drawBus(bus);
+            checkCollisions(bus); // Verifica colisiones con pasajeros y obstáculos
+        });
 
-    // Muestra el puntaje
-    ctx.fillStyle = 'black';
-    ctx.font = '20px Arial';
-    ctx.fillText(`Puntaje: ${score}`, 10, 20);
+        // Muestra el puntaje
+        ctx.fillStyle = 'black';
+        ctx.font = '20px Arial';
+        ctx.fillText(`Puntaje: ${score}`, 20, 20);
+    }
 }
 
-// Controla el movimiento de los buses
+// Controla el movimiento de los buses y reinicia el juego
 window.addEventListener('keydown', (e) => {
+    if (gameOver && e.code === 'Space') {
+        // Cambiar a la vista principal
+        document.getElementById('game-view').style.display = 'none';
+        document.getElementById('main-view').style.display = 'block';
+        return;
+    }
+
     const bus = buses['player1']; // Controla el bus del jugador
-    if (!bus) return;
+    if (!bus || gameOver) return;
 
     switch (e.key) {
         case 'ArrowUp':
