@@ -34,7 +34,7 @@ function connectWebSocket() {
         return;
     }
 
-    const socket = new SockJS("http://localhost:8080/ws");
+    const socket = new SockJS(window.location.origin + "/ws");
     window.client = new StompJs.Client({
         webSocketFactory: () => socket,
         debug: (str) => console.log(str),
