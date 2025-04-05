@@ -1,4 +1,4 @@
-
+let gameOver = false; // Bandera para indicar si el juego terminó
 let buses = {}; // Almacena los buses
 let passengers = []; // Almacena los pasajeros
 let obstacles = []; // Almacena los obstáculos
@@ -398,36 +398,59 @@ function checkCollisions(bus) {
             // Si ya no hay colisión, se puede eliminar del historial
             bus.collidedObstacles.delete(obstacleId);
         }
+
+        // Si el puntaje llega a 0, termina el juego
+        if (score === 20) {
+            gameOver = true;
+        }
     });
 }
 
 
 // Actualiza el estado del juego
 function updateGame() {
-    drawMap();
+    if (gameOver) {
+        // Mostrar pantalla de Game Over
+        ctx.fillStyle = '#22424a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height); // Reinicia el campo
+        ctx.fillStyle = '#e8dbb0';
+        ctx.font = '30px Monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('Game Win - Score: ' + score, canvas.width / 2, canvas.height / 2);
+        ctx.fillText('SPACE to continue', canvas.width / 2, canvas.height / 2 + 50);
+    } else {
+        drawMap();
 
-    // Dibuja los pasajeros
-    passengers.forEach(drawPassenger);
+        // Dibuja los pasajeros
+        passengers.forEach(drawPassenger);
 
-    // Dibuja los obstáculos
-    obstacles.forEach(drawObstacle);
+        // Dibuja los obstáculos
+        obstacles.forEach(drawObstacle);
 
-    // Dibuja los buses
-    Object.values(buses).forEach(bus => {
-        drawBus(bus);
-        checkCollisions(bus); // Verifica colisiones con pasajeros y obstáculos
-    });
+        // Dibuja los buses
+        Object.values(buses).forEach(bus => {
+            drawBus(bus);
+            checkCollisions(bus); // Verifica colisiones con pasajeros y obstáculos
+        });
 
-    // Muestra el puntaje
-    ctx.fillStyle = 'black';
-    ctx.font = '20px Arial';
-    ctx.fillText(`Puntaje: ${score}`, 20, 20);
+        // Muestra el puntaje
+        ctx.fillStyle = 'black';
+        ctx.font = '20px Arial';
+        ctx.fillText(`Puntaje: ${score}`, 20, 20);
+    }
 }
 
-// Controla el movimiento de los buses
+// Controla el movimiento de los buses y reinicia el juego
 window.addEventListener('keydown', (e) => {
+    if (gameOver && e.code === 'Space') {
+        // Cambiar a la vista principal
+        document.getElementById('game-view').style.display = 'none';
+        document.getElementById('main-view').style.display = 'block';
+        return;
+    }
+
     const bus = buses['player1']; // Controla el bus del jugador
-    if (!bus) return;
+    if (!bus || gameOver) return;
 
     switch (e.key) {
         case 'ArrowUp':
