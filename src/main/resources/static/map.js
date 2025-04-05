@@ -418,6 +418,13 @@ function updateGame() {
         ctx.textAlign = 'center';
         ctx.fillText('Game Win - Score: ' + score, canvas.width / 2, canvas.height / 2);
         ctx.fillText('SPACE to continue', canvas.width / 2, canvas.height / 2 + 50);
+        const spaceHandler = (e) => {
+            if (e.code === 'Space') {
+                window.removeEventListener('keydown', spaceHandler); // Clean up listener
+                window.location.href = '/'; // Redirect to root path
+            }
+        };
+        window.addEventListener('keydown', spaceHandler);
     } else {
         drawMap();
 
