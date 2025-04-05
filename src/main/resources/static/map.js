@@ -160,9 +160,9 @@ function drawBus(bus) {
 
     // Cambiar el color del bus según la puntuación
     let busColor;
-    if (score >= 10) {
+    if (score >= 20) {
         busColor = "red"; // Rojo si la puntuación es 10 o más
-    } else if (score >= 5) {
+    } else if (score >= 10) {
         busColor = "green"; // Verde si la puntuación es 5 o más
     } else {
         busColor = "yellow"; // Amarillo por defecto
@@ -199,7 +199,7 @@ function drawBus(bus) {
 
 // Genera pasajeros aleatorios en las zonas verdes
 function generatePeople(passengerArray = []) {
-    const minPassengers = 10; // Número mínimo de pasajeros
+    const minPassengers = 40; // Número mínimo de pasajeros
     const passengersToGenerate = Math.max(minPassengers - passengerArray.length, 0);
 
     // Generar pasajeros adicionales si es necesario
@@ -353,37 +353,50 @@ function moveBus(bus, direction) {
 
 // Detecta colisiones entre un bus y los pasajeros
 function checkCollisions(bus) {
-    const pickupRadius = tileSize / 3; // Define un radio de proximidad para recoger pasajeros
+    const pickupRadius = tileSize / 3;
+    const collisionRadius = tileSize / 3;
 
+    // Pasajeros
     passengers = passengers.filter(passenger => {
-        const distance = Math.sqrt(
-            Math.pow(bus.x + tileSize / 8 - passenger.x, 2) +
-            Math.pow(bus.y + tileSize / 8 - passenger.y, 2)
-        );
+        const dx = bus.x + tileSize / 8 - passenger.x;
+        const dy = bus.y + tileSize / 8 - passenger.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < pickupRadius) { // Si el pasajero está dentro del radio de proximidad
+        if (distance < pickupRadius) {
             console.log(`Pasajero recogido en posición (${passenger.x}, ${passenger.y})`);
-            score++; // Incrementa el puntaje
-            return false; // Elimina al pasajero de la lista
+            score++;
+            return false; // Elimina al pasajero
         }
-        return true; // Mantén al pasajero si no está dentro del rango
+        return true; // Mantén al pasajero
     });
 
-    // Detecta colisiones con obstáculos
-    obstacles.forEach(obstacle => {
-        const distance = Math.sqrt(
-            Math.pow(bus.x + tileSize / 8 - obstacle.x, 2) +
-            Math.pow(bus.y + tileSize / 8 - obstacle.y, 2)
-        );
+    // Si el bus no tiene un historial de colisiones, lo creamos
+    if (!bus.collidedObstacles) bus.collidedObstacles = new Set();
 
-        if (distance < tileSize / 4) {
-            if (obstacle.type === 'circle') {
-                console.log('Colisión con obstáculo circular');
-                score = Math.max(0, score - 1); // Resta 1 punto
-            } else if (obstacle.type === 'triangle') {
-                console.log('Colisión con obstáculo triangular');
-                score = Math.max(0, score - 2); // Resta 2 puntos
+    // Obstáculos
+    obstacles.forEach(obstacle => {
+        const dx = bus.x + tileSize / 8 - obstacle.x;
+        const dy = bus.y + tileSize / 8 - obstacle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const obstacleId = `${obstacle.x},${obstacle.y}`;
+
+        if (distance < collisionRadius) {
+            if (!bus.collidedObstacles.has(obstacleId)) {
+                if (obstacle.type === 'circle') {
+                    const penalty = Math.ceil(score / 2); // Redondea hacia arriba
+                    console.log(`Colisión con obstáculo circular (-${penalty})`);
+                    score = Math.max(0, score - penalty);
+                } else if (obstacle.type === 'triangle') {
+                    console.log('Colisión con obstáculo triangular ');
+                    score = Math.max(0, score - 2);
+                }
+
+                bus.collidedObstacles.add(obstacleId); // Marcar como colisionado
             }
+        } else {
+            // Si ya no hay colisión, se puede eliminar del historial
+            bus.collidedObstacles.delete(obstacleId);
         }
     });
 }
@@ -408,7 +421,7 @@ function updateGame() {
     // Muestra el puntaje
     ctx.fillStyle = 'black';
     ctx.font = '20px Arial';
-    ctx.fillText(`Puntaje: ${score}`, 10, 20);
+    ctx.fillText(`Puntaje: ${score}`, 20, 20);
 }
 
 // Controla el movimiento de los buses
