@@ -20,7 +20,7 @@ public class Passenger {
     for (Passenger passenger : passengers) {
         if (!passenger.isPickedUp() && passenger.isNearBus(bus)) {
             passenger.pickUp();
-            System.out.println("Pasajero " + passenger.getId() + " recogido por el bus " + bus.getId());
+            System.out.println("Pasajero " + passenger.getId() + " recogido por el bus " + bus.getPlate());
         }
     }
 }

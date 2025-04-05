@@ -30,48 +30,22 @@ function isOnRoad(x, y) {
     return isHorizontalRoad || isVerticalRoad;
 }
 
-// Asumiendo que `buses` es un objeto global que contiene todos los buses
-
-// Verificar si dos buses colisionan
-function checkCollision(bus1, bus2) {
-    const distance = Math.sqrt(
-        Math.pow(bus1.x - bus2.x, 2) + Math.pow(bus1.y - bus2.y, 2)
-    );
-
-    const minDistance = (bus1.width + bus2.width) / 2;  // Ajustar según el tamaño del bus
-
-    // Si la distancia entre los buses es menor que la distancia mínima, hay colisión
-    if (distance < minDistance) {
-        // Verificar si es una colisión frontal
-        if (Math.abs(bus1.angle - bus2.angle) <= 15) {
-            // Colisión frontal
-            return true;
-        }
-    }
-
-    return false;
-}
 
 // Manejar la colisión entre dos buses
-function handleCollision(bus1, bus2) {
-    if (checkCollision(bus1, bus2)) {
-        console.log(`¡Colisión frontal! El bus ${bus1.id} ha chocado con el bus ${bus2.id}.`);
-        // Eliminar el bus que ha muerto (puedes elegir uno de los dos o ambos)
-        delete buses[bus1.id]; // Ejemplo: eliminar el primer bus
-    }
-}
+
+
 
 // En la función updateBuses
 function updateBuses() {
     const busArray = Object.values(buses);
 
-    // Revisar las colisiones entre todos los buses
-    for (let i = 0; i < busArray.length; i++) {
-        for (let j = i + 1; j < busArray.length; j++) {
-            handleCollision(busArray[i], busArray[j]);
+    busArray.forEach((bus) => {
+        if (bus.canMove) {
+            bus.move();
         }
-    }
+    });
 }
+
 
 function drawBuses() {
     if (!window.ctx || !window.canvas) {

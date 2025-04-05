@@ -110,11 +110,26 @@ function suscribirEventos() {
           buses[id].angle = parseFloat(angle); // Actualizar la orientación
           buses[id].plate = plate; // Actualizar la placa
         }
-      } else if (data[0] === "COLLISION") {
-        const [bus1, bus2] = data[1].split(",");
-        delete buses[bus1];
-        delete buses[bus2];
-        console.log(`Buses colisionados: ${bus1}, ${bus2}`);
+      } else if (data[0].startsWith("COLLISION")) {
+        const [collisionData, outData] = message.body.split("|");
+        const collided = collisionData.replace("COLLISION:", "").split(",");
+
+        if (collided.length < 2) {
+          console.warn("⚠️ Colisión reportada con menos de 2 buses:", collided);
+        } else {
+          console.log("💥 Colisión entre:", collided.join(", "));
+        }
+
+        if (outData && outData.startsWith("OUT:")) {
+          const outBus = outData.replace("OUT:", "");
+          console.log("🗑️ Eliminando bus:", outBus);
+          delete buses[outBus];
+
+          if (outBus ===playerId) {
+            showGameOverPopup();
+            setTimeout(closeConnection, 2000);
+          }
+        }
       } else if (message.body.startsWith("PASSENGERS")) {
         const passengerData = JSON.parse(message.body.substring(10));
         console.log("Mensaje recibido del servidor: PASAJEROS", passengerData);
@@ -170,4 +185,25 @@ function suscribirEventos() {
   }
 
   setTimeout(requestPassengers, 1000);
+
+  function showGameOverPopup() {
+    const popup = document.getElementById("gameOverPopup");
+    if (popup) {
+      popup.style.display = "block";
+    }
+  }
+
+
+  function closeConnection() {
+    if (window.client && window.client.connected) {
+      window.client.deactivate(); // ✅ cierra la conexión STOMP segura
+      console.log("🔌 Desconectado del servidor tras colisión");
+      setTimeout(() => {
+        window.location.href = "index.html"; // o reload si prefieres
+      }, 1000);
+    } else {
+      window.location.href = "index.html"; // fallback por si no está conectado
+    }
+  }
+  
 }

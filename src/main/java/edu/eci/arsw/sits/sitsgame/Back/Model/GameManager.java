@@ -18,10 +18,9 @@ public class GameManager {
     private static final Random random = new Random();
     private static final int MAP_WIDTH = 1000;
     private static final int MAP_HEIGHT = 1000;
-    private static final int COLLISION_DISTANCE = 50;
 
     // Add this method to the GameManager class
-    
+
     public static List<Passenger> getPassengers() {
         return passengers;
     }
@@ -36,7 +35,7 @@ public class GameManager {
         if (bus != null) {
             Thread busThread = busThreads.remove(playerId);
             if (busThread != null && busThread.isAlive()) {
-                busThread.interrupt();  // Detener el thread del bus
+                busThread.interrupt(); // Detener el thread del bus
             }
         }
     }
@@ -61,31 +60,36 @@ public class GameManager {
         return buses.get(playerId);
     }
 
-    public static void checkCollisions(String playerId, SimpMessagingTemplate messagingTemplate) {
+    public static void detectAndHandleBusCollision(String playerId, SimpMessagingTemplate messagingTemplate) {
         Bus bus = buses.get(playerId);
-        if (bus != null) {
-            List<Passenger> remainingPassengers = new ArrayList<>();
-            synchronized (passengers) {
-                for (Passenger passenger : passengers) {
-                    if (isCollision(bus, passenger)) {
-                        incrementScore(playerId);
-                        generateRandomPassenger(messagingTemplate);
-                    } else {
-                        remainingPassengers.add(passenger);
-                    }
+        if (bus == null)
+            return;
+
+        for (Bus otherBus : getAllBuses()) {
+            if (!otherBus.getPlayerId().equals(playerId)) {
+                if (isCollision(bus, otherBus)) {
+                    String bus1 = bus.getPlayerId();
+                    String bus2 = otherBus.getPlayerId();
+
+                    String toRemove = Math.random() < 0.5 ? bus1 : bus2;
+
+                    removeBus(toRemove);
+
+                    String message = String.format("COLLISION:%s,%s|OUT:%s", bus1, bus2, toRemove);
+                    messagingTemplate.convertAndSend("/topic/game", message);
+
+                    break;
                 }
-                passengers.clear();
-                passengers.addAll(remainingPassengers);
             }
         }
     }
-    
-    private static boolean isCollision(Bus bus, Passenger passenger) {
-        double distance = Math.sqrt(
-            Math.pow(bus.getX() - passenger.getX(), 2) +
-            Math.pow(bus.getY() - passenger.getY(), 2)
-        );
-        return distance < COLLISION_DISTANCE;
+
+    private static boolean isCollision(Bus bus1, Bus bus2) {
+        int BUS_SIZE = 40; // ajusta esto al tamaño real de los buses
+        return bus1.getX() < bus2.getX() + BUS_SIZE &&
+                bus1.getX() + BUS_SIZE > bus2.getX() &&
+                bus1.getY() < bus2.getY() + BUS_SIZE &&
+                bus1.getY() + BUS_SIZE > bus2.getY();
     }
 
     private static void incrementScore(String playerId) {
@@ -112,10 +116,9 @@ public class GameManager {
         }
         messagingTemplate.convertAndSend("/topic/game-state", newPassenger);
     }
-    
 
     public static GameState getGameState() {
-        return new GameState(buses, passengers, scores); 
+        return new GameState(buses, passengers, scores);
     }
 
     public static ConcurrentMap<String, Integer> getAllScores() {
@@ -130,7 +133,7 @@ public class GameManager {
         }
     }
 
-    public static void clearPassengers(){
+    public static void clearPassengers() {
         passengers.clear();
     }
 

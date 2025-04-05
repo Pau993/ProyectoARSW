@@ -102,34 +102,10 @@ public class SitsGameController {
 
         Bus bus = GameManager.getBus(playerId);
         if (bus != null && isValidMove(bus, direction)) {
-            // Verificar si hay colisión con otro bus
-            for (Bus otherBus : GameManager.getAllBuses()) {
-                if (!otherBus.getPlayerId().equals(playerId)) {
-                    // Verificar colisión con otro bus
-                    if (isCollision(bus, otherBus)) {
-                        // Elegir aleatoriamente qué bus eliminar
-                        Bus busToRemove = Math.random() < 0.5 ? bus : otherBus;
-                        GameManager.removeBus(busToRemove.getPlayerId()); // Eliminar el bus elegido
-                        messagingTemplate.convertAndSend("/topic/game", "COLLISION:" + busToRemove.getPlayerId());
-                        return; // Salir después de eliminar el bus
-                    }
-                }
-            }
-
-            // Si no hay colisión, mover el bus
             bus.setDirection(direction);
             bus.allowMove();
-            bus.move(GameManager.getAllBuses());
+            GameManager.detectAndHandleBusCollision(playerId, messagingTemplate);
         }
-    }
-
-    private boolean isCollision(Bus bus1, Bus bus2) {
-        // Detecta colisión entre dos buses. La lógica puede variar según cómo defines
-        // colisión.
-        return bus1.getX() < bus2.getX() + BUS_SIZE &&
-                bus1.getX() + BUS_SIZE > bus2.getX() &&
-                bus1.getY() < bus2.getY() + BUS_SIZE &&
-                bus1.getY() + BUS_SIZE > bus2.getY();
     }
 
     private boolean isValidMove(Bus bus, String direction) {
