@@ -400,7 +400,7 @@ function checkCollisions(bus) {
         }
 
         // Si el puntaje llega a 0, termina el juego
-        if (score === 20) {
+        if (score === 30) {
             gameOver = true;
         }
     });

@@ -64,12 +64,28 @@ function suscribirEventos() {
     return;
   }
 
+  window.scores = {};
+
   window.client.subscribe("/topic/game", (message) => {
     console.log("Mensaje recibido del servidor:", message.body);
 
     const lines = message.body.split("\n");
     lines.forEach((line) => {
       const data = line.split(":");
+
+      // Manejar puntajes individuales
+      if (data[0] === "SCORES") {
+        const scoresData = JSON.parse(data[1]);
+        console.log("Puntajes recibidos:", scoresData);
+
+        // Actualizar el objeto global de puntajes
+        Object.keys(scoresData).forEach((playerId) => {
+          window.scores[playerId] = scoresData[playerId];
+        });
+
+        // Renderizar los puntajes
+        renderScores();
+      }
 
       if (data[0] === "NEW_BUS") {
         const [id, x, y, plate] = data[1].split(",");
@@ -125,7 +141,7 @@ function suscribirEventos() {
           console.log("🗑️ Eliminando bus:", outBus);
           delete buses[outBus];
 
-          if (outBus ===playerId) {
+          if (outBus === playerId) {
             showGameOverPopup();
             setTimeout(closeConnection, 2000);
           }
@@ -144,6 +160,25 @@ function suscribirEventos() {
     drawBuses(); // Dibujar solo los buses con placas
     updateBuses(); // Actualizar la posición de los buses
   });
+
+  // Función para renderizar los puntajes en el canvas o en un elemento HTML
+  function renderScores() {
+    const scoresContainer = document.getElementById("scoresContainer");
+    if (!scoresContainer) {
+      console.warn("No se encontró el contenedor de puntajes.");
+      return;
+    }
+
+    // Limpiar el contenedor antes de actualizar
+    scoresContainer.innerHTML = "";
+
+    // Crear una lista de puntajes
+    Object.entries(window.scores).forEach(([playerId, score]) => {
+      const scoreElement = document.createElement("div");
+      scoreElement.textContent = `Jugador ${playerId}: ${score} puntos`;
+      scoresContainer.appendChild(scoreElement);
+    });
+  }
 
   // Enviar solicitud para unirse al juego
   console.log("Enviando solicitud de conexión para", playerId);
@@ -196,7 +231,7 @@ function suscribirEventos() {
 
   function closeConnection() {
     if (window.client && window.client.connected) {
-      window.client.deactivate(); // ✅ cierra la conexión STOMP segura
+      window.client.deactivate(); // cierra la conexión STOMP segura
       console.log("🔌 Desconectado del servidor tras colisión");
       setTimeout(() => {
         window.location.href = "index.html"; // o reload si prefieres
@@ -205,5 +240,5 @@ function suscribirEventos() {
       window.location.href = "index.html"; // fallback por si no está conectado
     }
   }
-  
+
 }
